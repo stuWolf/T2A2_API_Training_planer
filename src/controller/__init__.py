@@ -1,9 +1,8 @@
-from controller.controllers import home
+from controller.controllers import user
 
 
 registerable_controllers = [
-    home,
-    user,
-    pet,
-    rental,
+   
+    user
+    
 ]
