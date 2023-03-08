@@ -1,4 +1,4 @@
-## PostgreSQL installation in Ubuntu (also valid for WSL)
+s## PostgreSQL installation in Ubuntu (also valid for WSL)
 ## Iryna Shymbor
  — 
 01/04/2023 9:52 AM
