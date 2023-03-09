@@ -6,9 +6,11 @@ class User(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
 
     username = db.Column(db.String(), nullable=False, unique=True)
-    verified = db.Column(db.Boolean())
+    admin = db.Column(db.Boolean())
     mobile_number = db.Column(db.String())
-    post_code = db.Column(db.String())
+    email = db.Column(db.String())
+    password = db.Column(db.String())
+
 
 class Workout(db.Model):
     __tablename__ = "workouts"
@@ -16,7 +18,9 @@ class Workout(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
 
     progres = db.Column(db.String(), nullable=False, unique=True)
-    date = db.Column(db.Boolean())
+    date = db.Column(db.Date())
+    rest_time = db.Column(db.String())
+    rounds = db.Column(db.String())
     user_id = db.Column(
         db.Integer(), db.ForeignKey("users.id"), nullable=False
     )
@@ -27,9 +31,7 @@ class Workout_Exercise(db.Model):
     __tablename__ = "workout_exercises"
 
     id = db.Column(db.Integer(), primary_key=True)
-
-    progres = db.Column(db.String(), nullable=False, unique=True)
-    date = db.Column(db.Boolean())
+    date = db.Column(db.Date())
     workout_id = db.Column(
         db.Integer(), db.ForeignKey("workouts.id"), nullable=False
     )
@@ -50,8 +52,6 @@ class Exercise(db.Model):
     description = db.Column(db.String())
     interval_time = db.Column(db.String())
     repetitions = db.Column(db.String())
-    rest_time = db.Column(db.String())
-    rounds = db.Column(db.String())
     muscle_group = db.Column(db.String())
     level = db.Column(db.String())
     

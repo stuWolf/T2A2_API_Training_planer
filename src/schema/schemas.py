@@ -2,7 +2,7 @@ from main import ma
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ("id", "username", "verified", "mobile_number", "post_code")
+        fields = ("id", "username", "admin", "mobile_number", "email", "password")
 
     # pets = ma.List(ma.Nested("PetSchema", exclude=("user",)))
 
@@ -11,7 +11,7 @@ users_schema = UserSchema(many=True)
 
 class WorkoutSchema(ma.Schema):
     class Meta:
-        fields = ("id", "progres", "date")
+        fields = ("id","rest_time", "rounds", "progres", "date")
         load_only = ["user_id"]
 
     user = ma.Nested("UserSchema")
@@ -22,22 +22,19 @@ workout_schema = WorkoutSchema()
 workouts_schema = WorkoutSchema(many=True)
 
 
-class Workout_ExerciseSchema(ma.Schema):
+class WorkoutExerciseSchema(ma.Schema):
     class Meta:
         fields = ("id", "date")
         load_only = ["workout_id, exercise_id"]
 
     workout = ma.Nested("WorkoutSchema")
     exercise = ma.Nested("ExerciseSchema")
-workout_exercise_schema = Workout_ExerciseSchema()
-workout_exercises_schema = Workout_ExerciseSchema(many=True)
+workout_exercise_schema = WorkoutExerciseSchema()
+workout_exercises_schema = WorkoutExerciseSchema(many=True)
 
 class ExerciseSchema(ma.Schema):
     class Meta:
-        fields = ("id", "name", "description", "interval_time", "repetitions", "rest_time", "rounds", "muscle_group", "level")
+        fields = ("id", "name", "description", "interval_time", "repetitions", "muscle_group", "level")
         
-
-   
-
-user_schema = ExerciseSchema()
-users_schema = ExerciseSchema(many=True)
+exercise_schema = ExerciseSchema()
+exercises_schema = ExerciseSchema(many=True)
