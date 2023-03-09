@@ -41,9 +41,6 @@ def create_user():
         # return an abort message to inform the user. That will end the request
         return abort(400, description="Email already registered")
 
-        
-
-
     user = User(**user_fields)
     user.password = bcrypt.generate_password_hash(user_fields["password"]).decode("utf-8")
         #Add it to the database and commit the changes
@@ -58,14 +55,40 @@ def create_user():
     # except:
     #     return { "message": "Your information is incorrect" }
     
-
-
     return user_schema.dump(user)
 
 
 # Delete User (admin only)
 
-# Amend User
+# Finally, we round out our CRUD resource with a DELETE method
+# @cards.route("/<int:id>/", methods=["DELETE"])
+# @user.delete("/<string:email>")
+@user.delete("/<string:email>")
+@jwt_required()
+def delete_user(email):
+    #get the operator id invoking get_jwt_identity
+    user_id = get_jwt_identity()
+    #Find it in the db
+    operator = User.query.get(user_id)
+    #Make sure it is in the database
+    if not operator:
+        return abort(401, description="Invalid operator")
+    # Stop the request if the user is not an admin
+    if not operator.admin:
+        return abort(401, description="Unauthorised operator")
+    # find the card
+    user = User.query.filter_by(email=email).first()
+    #return an error if the card doesn't exist
+    if not user:
+        return abort(400, description= f"User {email} does not exist")
+    
+    #Delete the card from the database and commit
+    db.session.delete(user)
+    db.session.commit()
+    #return the card in the response
+    return jsonify({"user":user.email, "user_id": user.id, '_comment': "deleted:"})
+
+# Amend User (only by the user)
 
 # Login
 
@@ -86,7 +109,7 @@ def auth_login():
     #create the access token
     access_token = create_access_token(identity=str(user.id), expires_delta=expiry)
     # return the user email and the access token
-    return jsonify({"user":user.email, "token": access_token, "user_id": user.id })
+    return jsonify({"user":user.email, "token": access_token, "admin": user.admin, "user_id": user.id })
 
 
 
