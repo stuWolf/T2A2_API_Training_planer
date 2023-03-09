@@ -34,7 +34,7 @@ workout_exercises_schema = WorkoutExerciseSchema(many=True)
 
 class ExerciseSchema(ma.Schema):
     class Meta:
-        fields = ("id", "name", "description", "interval_time", "repetitions", "muscle_group", "level")
+        fields = ("id", "name", "description", "interval_time", "repetitions", "muscle_group", "level", "weight")
         
 exercise_schema = ExerciseSchema()
 exercises_schema = ExerciseSchema(many=True)

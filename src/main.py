@@ -1,10 +1,14 @@
-from flask import Flask
+from flask import Flask, request, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import sqlalchemy as sa
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
 db = SQLAlchemy()
 ma = Marshmallow()
+bcrypt = Bcrypt()
+jwt = JWTManager()
 
 def create_app():
     # initialize flask app
@@ -15,6 +19,9 @@ def create_app():
 
     db.init_app(app)
     ma.init_app(app)
+    jwt.init_app(app)
+    bcrypt.init_app(app)
+
 
     from command.db import db_cmd
     app.register_blueprint(db_cmd)

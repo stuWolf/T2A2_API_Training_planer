@@ -54,4 +54,5 @@ class Exercise(db.Model):
     repetitions = db.Column(db.String())
     muscle_group = db.Column(db.String())
     level = db.Column(db.String())
+    weight = db.Column(db.String())
     
