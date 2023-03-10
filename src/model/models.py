@@ -17,7 +17,7 @@ class Workout(db.Model):
 
     id = db.Column(db.Integer(), primary_key=True)
 
-    progres = db.Column(db.String(), nullable=False, unique=True)
+    progres = db.Column(db.String())
     date = db.Column(db.Date())
     rest_time = db.Column(db.String())
     rounds = db.Column(db.String())
