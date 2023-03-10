@@ -8,7 +8,7 @@ class User(db.Model):
     username = db.Column(db.String(), nullable=False, unique=True)
     admin = db.Column(db.Boolean())
     mobile_number = db.Column(db.String())
-    email = db.Column(db.String())
+    email = db.Column(db.String(), unique=True)
     password = db.Column(db.String())
 
 
