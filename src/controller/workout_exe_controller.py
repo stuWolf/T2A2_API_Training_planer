@@ -1,9 +1,9 @@
 from main import db, bcrypt
 from flask import Blueprint, request, abort, jsonify
-from model.models import Workout_Exercise
+from model.models import Workout_Exercise, User, Workout, Exercise
 from schema.schemas import workout_exercise_schema, workout_exercises_schema
 from flask_jwt_extended import  jwt_required, get_jwt_identity
-
+from datetime import date
 
 
 workout_exercise = Blueprint('workout_exercises', __name__, url_prefix="/workout_exercises")
@@ -31,23 +31,27 @@ def get_workout_exercise(id):
     return workout_exercise_schema.dump(workout_exercise)
 
 
-# Register new workout_exercise
-@workout_exercise.post("/")
-def create_workout_exercise():
+# Create new workout_exercise
+@workout_exercise.post("/<int:workout_id>")
+def create_workout_exercise(workout_id):
+    # user_id = get_jwt_identity()
+    # user = User.query.get(user_id)
+    
+ 
+    
+    workout = Workout.query.get(workout_id)
+    if not workout:
+        return abort(401, description=f"a workout with the id {workout_id} does not exist")
+
     # try:
-    workout_exercise_fields = workout_exercise_schema.load(request.json)
+    # workout_exercise_fields = workout_exercise_schema.load(request.json)
          # find the workout_exercise
-    workout_exercise = Workout_Exercise.query.filter_by(email=workout_exercise_fields["email"]).first()
-
-    if workout_exercise:
-        # return an abort message to inform the user. That will end the request
-        return abort(400, description="Email already registered")
-
-    workout_exercise = Workout_Exercise(**workout_exercise_fields)
-    user.password = bcrypt.generate_password_hash(user_fields["password"]).decode("utf-8")
-        #Add it to the database and commit the changes
-    user.admin = False  # false by default, not every user can be admin
-
+    # exercise = Exercise.query.limit(1)
+    # exercise_id = exercise.id
+    workout_exercise = Workout_Exercise
+    workout_exercise.date = date.today()
+    workout_exercise.workout_id = workout_id
+    workout_exercise.exercise_id = exercise_id
     db.session.add(workout_exercise)
     db.session.commit()
         #create a variable that sets an expiry date
@@ -108,22 +112,18 @@ def update_workout_exercise():
     # tests if email already exists in any user except the une logged in
     user_any = Workout_Exercise.query.filter_by(email=email).first()
 
-    if user_any and not user.email == email:
-        # return an abort message to inform the user. That will end the request
-        return abort(400, description=f"Email {email } already registered")
-      #find the user
+ 
 
 
     
-    if not user.admin == True:
-        user.admin = False  # false by default, not every user can be admin
+   
 
     # if user:
     #     # return an abort message to inform the user. That will end the request
     #     return abort(400, description="Email already registered")
 # update user record
     # user = User(**user_fields)
-    workout_exercise.id = workout_exercise_id  # keep old workout_exercise id
+    workout_exercise.workout_id = workout_id  # keep old workout_exercise id
     workout_exercise.workout_exercisename = workout_exercise_fields["workout_exercisename"]
     workout_exercise.mobile_number = workout_exercise_fields["mobile_number"]
     workout_exercise.email = email

@@ -17,7 +17,7 @@ class Workout(db.Model):
     __tablename__ = "workouts"
 
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), nullable=False, unique=True)
+    name = db.Column(db.String(), nullable=False)
     progres = db.Column(db.String())
     date = db.Column(db.Date())
     rest_time = db.Column(db.String())

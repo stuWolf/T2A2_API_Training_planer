@@ -75,7 +75,7 @@ def delete_workout(id):
     workout = Workout.query.filter_by(id=id).first()
     # Stop the request if the user is not an admin or tries to edit someone elses card
     if not (user.admin or  (user_id == workout.user_id)):
-        return abort(401, description="You can only edit your own cards or need to be an admin")
+        return abort(401, description="You can only edit your own workouts or need to be an admin")
    
     
     #return an error if the card doesn't exist

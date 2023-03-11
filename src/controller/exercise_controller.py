@@ -17,15 +17,21 @@ def get_exercises():
     exercises = Exercise.query.all()
     return exercises_schema.dump(exercises)
 
+@exercise.get("/<int:nr>")
+def get_nr_exercises(nr):
+    exercises = Exercise.query.limit(nr)
+    return jsonify({"exercise_id":exercises.name,  '_comment': "deleted:"})
+    # return exercises_schema.dump(exercises)
+
 # print exercise by id
-@exercise.get("/<int:id>")
-def get_exercise(id):
-    exercise = Exercise.query.get(id)
+# @exercise.get("/<int:id>")
+# def get_exercise(id):
+#     exercise = Exercise.query.get(id)
 
-    if not exercise:
-        return { "message": "An Exercise with that id doesn't exist" }
+#     if not exercise:
+#         return { "message": "An Exercise with that id doesn't exist" }
 
-    return exercise_schema.dump(exercise)
+#     return exercise_schema.dump(exercise)
 
 
 # Register new exercise (admin only)
