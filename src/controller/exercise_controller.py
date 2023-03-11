@@ -4,7 +4,7 @@ from flask import Blueprint, request, abort, jsonify
 from model.models import  Exercise, User
 from schema.schemas import  exercise_schema, exercises_schema
 from flask_jwt_extended import  jwt_required, get_jwt_identity
-
+from sqlalchemy import func
 
 
 exercise = Blueprint('exercises', __name__, url_prefix="/exercises")
@@ -19,9 +19,12 @@ def get_exercises():
 
 @exercise.get("/<int:nr>")
 def get_nr_exercises(nr):
-    exercises = Exercise.query.limit(nr)
-    return jsonify({"exercise_id":exercises.name,  '_comment': "deleted:"})
-    # return exercises_schema.dump(exercises)
+    random_element = Exercise.query.order_by(func.random()).limit(1).one()
+    # exercises = Exercise.query.limit(nr)
+    print (random_element.id)
+    # return jsonify({"exercises_id": exercises.exercises_id, '_comment': "deleted:"})
+    # return exercises_schema.dump(random_element)
+    return jsonify({'_comment': random_element.id})
 
 # print exercise by id
 # @exercise.get("/<int:id>")
