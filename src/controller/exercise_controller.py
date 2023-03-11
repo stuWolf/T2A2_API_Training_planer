@@ -98,12 +98,13 @@ def update_exercise():
     if not exercise:
         # return an abort message to inform the exercise. That will end the request
         return abort(400, description=f"An exercise with the name {name} does not exist")
-    exercise.id = exercise.id # keep old exercise id
+    # old_id = exercise.id
+    # create new object with updated exercise filds
     # exercise = Exercise(**exercise_fields)
-      
+    # exercise.id = old_id # keep old exercise id
     exercise.name = exercise_fields["name"]
     exercise.description = exercise_fields["description"]
-    exercise.interval_time = exercise_fields["description"]
+    exercise.interval_time = exercise_fields["interval_time"]
     exercise.repetitions = exercise_fields["repetitions"]
     exercise.muscle_group = exercise_fields["muscle_group"]
     exercise.level = exercise_fields["level"]

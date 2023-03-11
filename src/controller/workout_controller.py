@@ -1,5 +1,6 @@
-from main import db, bcrypt
+from main import db
 from flask import Blueprint, request, abort, jsonify
+from datetime import date
 from model.models import Workout, User
 from schema.schemas import workout_schema, workouts_schema
 from flask_jwt_extended import  jwt_required, get_jwt_identity
@@ -18,7 +19,10 @@ def get_workouts():
     workouts = Workout.query.all()
     return workouts_schema.dump(workouts)
 
-# print workout by id
+
+# print all workouts of a certain user
+
+# print workout of a speific id
 @workout.get("/<int:id>")
 def get_workout(id):
     workout = Workout.query.get(id)
@@ -37,96 +41,103 @@ def create_workout():
     # user = User.query.get(user_id)
 
     workout_fields = workout_schema.load(request.json)
-        
-    workout.user_id = user_id
+    # create workout object
     workout = Workout(**workout_fields)
-    
+    workout.date = date.today()
+    workout.user_id = user_id
     db.session.add(workout)
     db.session.commit()
-        #create a variable that sets an expiry date
-        # expiry = timedelta(days=1)
-        #create the access token
-        # access_token = create_access_token(identity=str(user.id), expires_delta=expiry)
-    # except:
-    #     return { "message": "Your information is incorrect" }
+       
     
     return workout_schema.dump(workout)
 
 
-# Delete workout (admin or user can delete himself )
+# Delete workout (only admin or user who created it can delete )
 
-@workout.delete("/<string:email>")
+@workout.delete("/<int:id>")
 @jwt_required()
-def delete_workout(email):
+def delete_workout(id):
     #get the operator id invoking get_jwt_identity and find it in the DB
-    user_id = get_jwt_identity()
-    operator = Workout.query.get(user_id)
-    #Make sure operator is in the database
-    if not operator:
-        return abort(401, description="Invalid operator")
-    # Stop the request if the user is not an admin
-    if not operator.admin:
-        return abort(401, description="You need admin rights for this operation")
-    # find the card
-    workout = Workout.query.filter_by(email=email).first()
-    #return an error if the card doesn't exist
+    user_id = int(get_jwt_identity())
+    user = User.query.get(user_id)
+    
+    #Test if workouts with this id exist
+
+    workout = Workout.query.get(id)
     if not workout:
-        return abort(400, description= f"workout {email} does not exist")
+        return abort(401, description=f"a workout with the id {id} does not exist")
+
+    workout = Workout.query.get(user_id)
+    #Test if workouts under the name of operator exist
+    if not workout:
+        return abort(401, description="you have no workouts created yet")
+    # get the workout
+    workout = Workout.query.filter_by(id=id).first()
+    # Stop the request if the user is not an admin or tries to edit someone elses card
+    if not (user.admin or  (user_id == workout.user_id)):
+        return abort(401, description="You can only edit your own cards or need to be an admin")
+   
+    
+    #return an error if the card doesn't exist
+    # if not workout:
+    #     return abort(400, description= f"workout {email} does not exist")
     
     #Delete the card from the database and commit
     db.session.delete(workout)
     db.session.commit()
-    #return the card in the response
-    return jsonify({"user":user.email, "workout_id": workout.id, '_comment': "deleted:"})
+    #return the workout in the response
+    return jsonify({"workout_user":workout.user_id, "logedin_user": user_id, "workout_id": workout.id, '_comment': "deleted:"})
 
 # Amend workout (only by the user itself)
 
-@workout.put("/update")
+@workout.put("/update/<int:id>")
 @jwt_required()
-def update_workout():
+def update_workout(id):
+   
+   #get the operator id invoking get_jwt_identity and find it in the DB
+    user_id = int(get_jwt_identity())
+    user = User.query.get(user_id)
+    workout = Workout.query.get(id)
+    if not workout:
+        return abort(401, description=f"a workout with the id {id} does not exist")
 
-    user_id = get_jwt_identity()
-    operator = Workout.query.get(user_id)
-    #Make sure operator is in the database
-    if not operator:
-        return abort(401, description=f"Invalid operator {user_id}")
-    else:
-              #find the workout
-        workout = Workout.query.filter_by(id=workout_id).first()
+    workout = Workout.query.get(user_id)
+    #Test if workouts under the name of operator exist
+    if not workout:
+        return abort(401, description="you have no workouts created yet")
+    # get the workout
+    workout = Workout.query.filter_by(id=id).first()
+    # Stop the request if the user is not an admin or tries to edit someone elses card
+    if not (user.admin or  (user_id == workout.user_id)):
+        return abort(401, description="You can only edit your own workouts or need to be an admin")
 
 
     # load workout fields from json
     workout_fields = workout_schema.load(request.json)
-    email=user_fields["email"]
-    # tests if email already exists in any user except the une logged in
-    user_any = Workout.query.filter_by(email=email).first()
-
-    if user_any and not user.email == email:
-        # return an abort message to inform the user. That will end the request
-        return abort(400, description=f"Email {email } already registered")
-      #find the user
-
-
-    
-    if not user.admin == True:
-        user.admin = False  # false by default, not every user can be admin
-
-    # if user:
-    #     # return an abort message to inform the user. That will end the request
-    #     return abort(400, description="Email already registered")
-# update user record
-    # user = User(**user_fields)
-    workout.id = workout_id  # keep old workout id
-    workout.workoutname = workout_fields["workoutname"]
-    workout.mobile_number = workout_fields["mobile_number"]
-    workout.email = email
-    workout.password = bcrypt.generate_password_hash(workout_fields["password"]).decode("utf-8")
-        #Add it to the database and commit the changes
+    # name=workout_fields["name"]
+     # find the workout, test if it exists
+    workout = Workout.query.filter_by(id=id).first()
+    # exercise = Exercise.query.get(name) # argument needs to be int, so id only
+    # if not workout:
+    #     # return an abort message to inform the exercise. That will end the request
+    #     return abort(400, description=f"An workout with the name {name} does not exist")
+    # old_id = workout.id
+    # user_id = workout.user_id
+    # create new object with updated exercise filds
+    # workout = Workout(**workout_fields)
+    # workout.id = old_id # keep old exercise id
+    # workout.user_id = user_id
+    workout.date = date.today()
+    workout.name = workout_fields["name"]
+    workout.progres = workout_fields["progres"]
+    workout.rest_time = workout_fields["rest_time"]
+    workout.rounds = workout_fields["rounds"]
     
 
+    # db.session.add(workout)
     db.session.commit()
-    return jsonify({"user":user.email, "usename": user.username, "user_id": user.id, '_comment': "updated:"})
-    
+    # return jsonify({"user":user.email, "workout_name": workout.name, "workout_id": workout.id, '_comment': "updated:"})
+    return workout_schema.dump(workout)
 
 
 

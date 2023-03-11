@@ -48,9 +48,20 @@ def db_seed():
         mobile_number = "2345235"
     )
     db.session.add(user1)
+
+    user2 = User(
+        username = 'Wolf Blitzer',
+        email = "wolf@email.com",
+        password = bcrypt.generate_password_hash("pword123").decode("utf-8"),
+        admin = False,
+        # password = "password123",
+        mobile_number = "0404 456 464"
+    )
+    db.session.add(user2)
     db.session.commit()
 
     first_workout = Workout(
+        name = "upper body",
         progres = '25 min',
         date = date.today(),
         rest_time = "1 min",
@@ -60,7 +71,8 @@ def db_seed():
     )
     db.session.add(first_workout)
 
-    other_workout = Workout(
+    core_workout = Workout(
+        name = "core",
         progres = '30 min',
         date = date.today(),
         rest_time = "2 min",
@@ -68,8 +80,18 @@ def db_seed():
         
         user_id = admin_user.id
     )
-    db.session.add(other_workout)
+    db.session.add(core_workout)
 
+    whole_workout = Workout(
+        name = "whole",
+        progres = '30 min',
+        date = date.today(),
+        rest_time = "2 min",
+        rounds = "8",
+        
+        user_id = admin_user.id
+    )
+    db.session.add(whole_workout)
 
     pull_ups = Exercise(
         name = "Pull Ups",

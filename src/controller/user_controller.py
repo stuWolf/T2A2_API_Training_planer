@@ -1,8 +1,8 @@
 from main import db, bcrypt
 from flask import Blueprint, request, abort, jsonify
 from datetime import timedelta
-from model.models import User, Workout, Workout_Exercise, Exercise
-from schema.schemas import user_schema,users_schema, workout_schema, workouts_schema, workout_exercises_schema, workout_exercise_schema, exercise_schema, exercises_schema
+from model.models import User
+from schema.schemas import user_schema,users_schema
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 
