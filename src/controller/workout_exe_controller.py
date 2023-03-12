@@ -4,7 +4,7 @@ from model.models import Workout_Exercise, User, Workout, Exercise
 from schema.schemas import workout_exercise_schema, workout_exercises_schema
 from flask_jwt_extended import  jwt_required, get_jwt_identity
 from datetime import date
-
+from sqlalchemy import func
 
 workout_exercise = Blueprint('workout_exercises', __name__, url_prefix="/workout_exercises")
 
@@ -15,9 +15,15 @@ workout_exercise = Blueprint('workout_exercises', __name__, url_prefix="/workout
 # look up exercises for each exercise id and print them out
 
 # print all workout_exercises
-@workout_exercise.get("/")
-def get_workout_exercises():
-    workout_exercises = Workout_Exercise.query.all()
+# @workout_exercise.get("/")
+# def get_workout_exercises():
+#     workout_exercises = Workout_Exercise.query.all()
+#     return workout_exercises_schema.dump(workout_exercises)
+
+@workout_exercise.get("/<int:workout_id>")
+def get_exercises(workout_id):
+    # exercises = Exercise.query.all()
+    workout_exercises = Workout_Exercise.query.filter_by(workout_id=workout_id)
     return workout_exercises_schema.dump(workout_exercises)
 
 # print workout_exercise by id
@@ -31,35 +37,50 @@ def get_workout_exercise(id):
     return workout_exercise_schema.dump(workout_exercise)
 
 
-# Create new workout_exercise
+
+# Create 4 new workout_exercise
+def pick_exercises(workout_id):
+
+    for i in range (4):
+        #pick 4 exercises and store them in workout_exercise table
+        exercise = Exercise.query.order_by(func.random()).limit(1).one()
+        exercise_id = exercise.id
+    
+        workout_exercise = Workout_Exercise()
+        workout_exercise.date = date.today()
+        workout_exercise.workout_id = workout_id
+        workout_exercise.exercise_id = exercise_id
+        db.session.add(workout_exercise)
+        db.session.commit()
+    return
+
+
+# Create 4 new workout_exercise 
 @workout_exercise.post("/<int:workout_id>")
 def create_workout_exercise(workout_id):
     # user_id = get_jwt_identity()
     # user = User.query.get(user_id)
     
- 
     
     workout = Workout.query.get(workout_id)
     if not workout:
         return abort(401, description=f"a workout with the id {workout_id} does not exist")
-
+        
+    for i in range (4):
+        exercise = Exercise.query.order_by(func.random()).limit(1).one()
+        exercise_id = exercise.id
     # try:
     # workout_exercise_fields = workout_exercise_schema.load(request.json)
          # find the workout_exercise
     # exercise = Exercise.query.limit(1)
-    # exercise_id = exercise.id
-    workout_exercise = Workout_Exercise
-    workout_exercise.date = date.today()
-    workout_exercise.workout_id = workout_id
-    workout_exercise.exercise_id = exercise_id
-    db.session.add(workout_exercise)
-    db.session.commit()
-        #create a variable that sets an expiry date
-        # expiry = timedelta(days=1)
-        #create the access token
-        # access_token = create_access_token(identity=str(user.id), expires_delta=expiry)
-    # except:
-    #     return { "message": "Your information is incorrect" }
+    # creatennew object
+        workout_exercise = Workout_Exercise()
+        workout_exercise.date = date.today()
+        workout_exercise.workout_id = workout_id
+        workout_exercise.exercise_id = exercise_id
+        db.session.add(workout_exercise)
+        db.session.commit()
+       
     
     return workout_exercise_schema.dump(workout_exercise)
 

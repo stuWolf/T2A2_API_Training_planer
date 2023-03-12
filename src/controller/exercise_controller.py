@@ -1,7 +1,7 @@
 from main import db
 from flask import Blueprint, request, abort, jsonify
 
-from model.models import  Exercise, User
+from model.models import  Exercise, User, Workout_Exercise
 from schema.schemas import  exercise_schema, exercises_schema
 from flask_jwt_extended import  jwt_required, get_jwt_identity
 from sqlalchemy import func
@@ -17,14 +17,24 @@ def get_exercises():
     exercises = Exercise.query.all()
     return exercises_schema.dump(exercises)
 
-@exercise.get("/<int:nr>")
-def get_nr_exercises(nr):
-    random_element = Exercise.query.order_by(func.random()).limit(1).one()
+
+
+@exercise.get("/<string:muscle_group>")
+def get_nr_exercises(muscle_group):
+
+    # Filter the table to get the rows with matching attribute_name
+    # filtered_rows = Exercise.query.filter(Exercise.muscle_group==muscle_group).all()
+
+# Choose a random row from the filtered rows
+    # random_element = Exercise.query.filter(Exercise.muscle_group==muscle_group).order_by(func.random()).limit(1).one()
+    exercises = Exercise.query.filter_by(muscle_group=muscle_group).limit(2)
+    
+    # random_element = exercises.query.order_by(func.random()).limit(1).one()
     # exercises = Exercise.query.limit(nr)
-    print (random_element.id)
+    # print (random_element.id)
     # return jsonify({"exercises_id": exercises.exercises_id, '_comment': "deleted:"})
-    # return exercises_schema.dump(random_element)
-    return jsonify({'_comment': random_element.id})
+    return exercises_schema.dump(exercises)
+    # return jsonify({'_comment': random_element.id})
 
 # print exercise by id
 # @exercise.get("/<int:id>")
@@ -44,14 +54,16 @@ def create_exercise():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
 
-    exercise_fields = exercise_schema.load(request.json)
-    name=exercise_fields["name"]
-     # find the exercise, test if already exists
-    exercise = Exercise.query.filter_by(name=name).first()
+    
     if not user.admin:
         return abort(401, description="You need admin rights for this operation")
+    
+    exercise_fields = exercise_schema.load(request.json)
+    name=exercise_fields["name"]
+     # find the exercise, test if name already exists
+    exercise = Exercise.query.filter_by(name=name).first()
     if exercise:
-        # return an abort message to inform the exercise. That will end the request
+        
         return abort(400, description=f"An exercise with the name {name} already exists")
     
     exercise = Exercise(**exercise_fields)
