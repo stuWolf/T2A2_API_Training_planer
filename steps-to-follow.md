@@ -46,6 +46,15 @@ Admin can add and delete exercises
 print all workouts of a certain user
 The user who created it can update the time taken to complete a workout, delete a workout
 
+12/03 Sun
+Implemented Function to choose 4 exercises out of the exercise table in exercise controller and store the relation in the workout_exercises table
+This functin is triggered when creating a workout
+
+13/03 Mon
+Update workout function: make sure that user can not change the name to an existing name
+Start documentation
+
+
 ## Workout_exercises controller:
 A user can trigger a function that generate a workout consistent of 4 HIT exercises chosen randomly out of the exercise table.
 The user can add some criteria like level or muscle group.
