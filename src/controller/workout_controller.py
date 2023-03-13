@@ -64,9 +64,9 @@ def create_workout():
     # print(name)
     db.session.add(workout)
     db.session.commit()
-    #pick 4 exercises and store them in workout_exercise table
-    pick_exercises(workout.id)
-    
+    #pick 4 exercises based on creterias muscle group and level and store them in workout_exercise table
+    result = pick_exercises(workout.id, workout.muscle_group, workout.level)
+    print(f"workout created with {workout.muscle_group, workout.level} and {result}")
     return workout_schema.dump(workout)
 
 

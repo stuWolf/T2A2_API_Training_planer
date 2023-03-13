@@ -1,6 +1,6 @@
 from main import db, bcrypt
 from flask import Blueprint, request, abort, jsonify
-from model.models import Workout_Exercise, User, Workout, Exercise
+from model.models import Workout_Exercise, Workout, Exercise, Exercise_filter
 from schema.schemas import workout_exercise_schema, workout_exercises_schema
 from flask_jwt_extended import  jwt_required, get_jwt_identity
 from datetime import date
@@ -19,14 +19,16 @@ workout_exercise = Blueprint('workout_exercises', __name__, url_prefix="/workout
 # def get_workout_exercises():
 #     workout_exercises = Workout_Exercise.query.all()
 #     return workout_exercises_schema.dump(workout_exercises)
+
 # Display all exercise based on workout ID
+# change to workout name !
 @workout_exercise.get("/<int:workout_id>")
 def get_exercises(workout_id):
     # exercises = Exercise.query.all()
     workout_exercises = Workout_Exercise.query.filter_by(workout_id=workout_id)
     return workout_exercises_schema.dump(workout_exercises)
 
-# print workout_exercise by id
+# print workout_exercise of one id
 @workout_exercise.get("/<int:id>")
 def get_workout_exercise(id):
     workout_exercise = Workout_Exercise.query.get(id)
@@ -37,25 +39,51 @@ def get_workout_exercise(id):
     return workout_exercise_schema.dump(workout_exercise)
 
 
-
+#pick 4 exercises based on creterias muscle group and level and store them in workout_exercise table
 # Create 4 new workout_exercise
-def pick_exercises(workout_id):
-
-    for i in range (4):
+def pick_exercises(workout_id, muscle_group, level):
+# if muscle_group or level are not null, the exercises need to be filtered and stored in 
+# an own table first. Than the program can pick random exercises from the filtered table
+# the output of query itself is not colatable
+    if not (muscle_group or level):
+        for i in range (4):
         #pick 4 exercises and store them in workout_exercise table
-        exercise = Exercise.query.order_by(func.random()).limit(1).one()
-        exercise_id = exercise.id
-    
-        workout_exercise = Workout_Exercise()
-        workout_exercise.date = date.today()
-        workout_exercise.workout_id = workout_id
-        workout_exercise.exercise_id = exercise_id
-        db.session.add(workout_exercise)
+            exercise = Exercise.query.order_by(func.random()).limit(1).one()
+        # exercise_id = exercise.id
+            add_workout_exercise_row(workout_id,exercise.id)
+           
+        return ("muscle group and level are mixed")
+
+    if muscle_group and not level:
+        filter_exercises = Exercise_filter()
+        # get all exercises of muscle group
+        filter_exercises = Exercise.query.filter_by(muscle_group=muscle_group)
+        # store exercises in Exercise filter table
+        db.session.add(filter_exercises)
         db.session.commit()
-    return
+        for i in range (4):
+        #pick 4 exercises from filtered exercises and store them in workout_exercise table
+            exercise = Exercise_filter.query.order_by(func.random()).limit(1).one()
+        # write exercise in workout exercise table
+            add_workout_exercise_row(workout_id,exercise.id)
+        return ("level is mixed")
+    
+    if not muscle_group and level:
+
+        return ("muscle_group is mixed")
+
+# write exercise in workout exercise table
+def add_workout_exercise_row(workout_id,exercise_id):
+    
+    workout_exercise = Workout_Exercise()
+    workout_exercise.date = date.today()
+    workout_exercise.workout_id = workout_id
+    workout_exercise.exercise_id = exercise_id
+    db.session.add(workout_exercise)
+    db.session.commit()
 
 
-# Create 4 new workout_exercise 
+# Help Function :Create 4 new workout_exercise 
 @workout_exercise.post("/<int:workout_id>")
 def create_workout_exercise(workout_id):
     # user_id = get_jwt_identity()
@@ -85,89 +113,6 @@ def create_workout_exercise(workout_id):
     return workout_exercise_schema.dump(workout_exercise)
 
 
-# Delete workout_exercise (admin or user can delete himself )
+# Delete workout_exercise (only admin or user who created it )
+# not needed as will be deleted automatically with the workout
 
-@workout_exercise.delete("/<string:email>")
-@jwt_required()
-def delete_workout_exercise(email):
-    #get the operator id invoking get_jwt_identity and find it in the DB
-    user_id = get_jwt_identity()
-    operator = Workout_Exercise.query.get(user_id)
-    #Make sure operator is in the database
-    if not operator:
-        return abort(401, description="Invalid operator")
-    # Stop the request if the user is not an admin
-    if not operator.admin:
-        return abort(401, description="You need admin rights for this operation")
-    # find the card
-    workout_exercise = Workout_Exercise.query.filter_by(email=email).first()
-    #return an error if the card doesn't exist
-    if not workout_exercise:
-        return abort(400, description= f"workout_exercise {email} does not exist")
-    
-    #Delete the card from the database and commit
-    db.session.delete(workout_exercise)
-    db.session.commit()
-    #return the card in the response
-    return jsonify({"user":user.email, "workout_exercise_id": workout_exercise.id, '_comment': "deleted:"})
-
-# Amend workout_exercise (only by the user itself)
-
-@workout_exercise.put("/update")
-@jwt_required()
-def update_workout_exercise():
-
-    user_id = get_jwt_identity()
-    operator = Workout_Exercise.query.get(user_id)
-    #Make sure operator is in the database
-    if not operator:
-        return abort(401, description=f"Invalid operator {user_id}")
-    else:
-              #find the workout
-        workout_exercise = Workout_Exercise.query.filter_by(id=workout_exercise_id).first()
-
-
-    # load workout fields from json
-    workout_exercise_fields = workout_exercise_schema.load(request.json)
-    email=user_fields["email"]
-    # tests if email already exists in any user except the une logged in
-    user_any = Workout_Exercise.query.filter_by(email=email).first()
-
- 
-
-
-    
-   
-
-    # if user:
-    #     # return an abort message to inform the user. That will end the request
-    #     return abort(400, description="Email already registered")
-# update user record
-    # user = User(**user_fields)
-    workout_exercise.workout_id = workout_id  # keep old workout_exercise id
-    workout_exercise.workout_exercisename = workout_exercise_fields["workout_exercisename"]
-    workout_exercise.mobile_number = workout_exercise_fields["mobile_number"]
-    workout_exercise.email = email
-    workout_exercise.password = bcrypt.generate_password_hash(workout_exercise_fields["password"]).decode("utf-8")
-        #Add it to the database and commit the changes
-    
-
-    db.session.commit()
-    return jsonify({"user":user.email, "usename": user.username, "user_id": user.id, '_comment': "updated:"})
-    
-
-
-
-# Login
-
-
-
-
-# create, ammend and delete exercise (admin only)
-
-
-# Create workout exercise ( randomly choose 4 exercises from exercises list)
-
-# print out all exercises of a workout id
-# fetch all exercises of under a workout id number from Workout_exercises 
-# look up exercises for each exercise id and print them out
