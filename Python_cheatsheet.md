@@ -565,3 +565,7 @@ f.readlines()
 ['This is my first file\n', 'This file\n', 'contains three lines\n']
 
 f.writelines(['writes', 'a', 'list', 'of' , 'lines'])
+
+
+# pip freeze
+pip freeze > requirements.txt

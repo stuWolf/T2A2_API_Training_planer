@@ -49,6 +49,7 @@ The user who created it can update the time taken to complete a workout, delete 
 12/03 Sun
 Implemented Function to choose 4 exercises out of the exercise table in exercise controller and store the relation in the workout_exercises table
 This functin is triggered when creating a workout
+Display all exercise based on a workout Id workout controller, function to pick 4 random exercises
 
 13/03 Mon
 Update workout function: make sure that user can not change the name to an existing name
