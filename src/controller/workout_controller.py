@@ -105,7 +105,7 @@ def delete_workout(id):
     #return the workout in the response
     return jsonify({"workout_user":workout.user_id, "logedin_user": user_id, "workout_id": workout.id, '_comment': "deleted:"})
 
-# Amend workout (only by the user itself)
+# Amend workout (only user who created it)
 
 @workout.put("/update/<int:id>")
 @jwt_required()
