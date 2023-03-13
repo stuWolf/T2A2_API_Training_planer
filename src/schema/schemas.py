@@ -39,7 +39,7 @@ class WorkoutExerciseSchema(ma.Schema):
         fields = ("id", "date","workout_id", "exercise_id", "workout", "exercise")
         load_only = ["workout_id", "exercise_id"]
 
-    workout = ma.Nested("WorkoutSchema")
+    workout = ma.Nested("WorkoutSchema", only=("workout_name", "rest_time", "rounds"))
     exercise = ma.Nested("ExerciseSchema")
 workout_exercise_schema = WorkoutExerciseSchema()
 workout_exercises_schema = WorkoutExerciseSchema(many=True)
