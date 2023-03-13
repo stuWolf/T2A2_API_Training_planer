@@ -99,6 +99,9 @@ def db_seed():
     )
     db.session.add(whole_workout)
 
+
+   
+
     pull_ups = Exercise(
         name = "Pull Ups",
         description = "deploy core",

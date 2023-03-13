@@ -55,3 +55,17 @@ class Exercise(db.Model):
     level = db.Column(db.String())
     weight = db.Column(db.String())
     workout_exercises = db.relationship('Workout_Exercise', backref='exercise', cascade="all, delete")
+
+class Exercise_filter(db.Model):
+    __tablename__ = "exercises_filter"
+
+    id = db.Column(db.Integer(), primary_key=True)
+
+    name = db.Column(db.String(), nullable=False, unique=True)
+    description = db.Column(db.String())
+    interval_time = db.Column(db.String())
+    repetitions = db.Column(db.String())
+    muscle_group = db.Column(db.String())
+    level = db.Column(db.String())
+    weight = db.Column(db.String())
+    workout_exercises = db.relationship('Workout_Exercise', backref='exercise', cascade="all, delete")

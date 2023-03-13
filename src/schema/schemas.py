@@ -4,12 +4,19 @@ from main import ma
 
 class ExerciseSchema(ma.Schema):
     class Meta:
+        ordered = True
         fields = ("id", "name", "description", "interval_time", "repetitions", "muscle_group", "level", "weight")
         
 exercise_schema = ExerciseSchema()
 exercises_schema = ExerciseSchema(many=True)
 
-
+class Exercise_filterSchema(ma.Schema):
+    class Meta:
+        ordered = True
+        fields = ("id", "name", "description", "interval_time", "repetitions", "muscle_group", "level", "weight")
+        
+exercise_filter_schema = ExerciseSchema()
+exercises_filter_schema = ExerciseSchema(many=True)
 
 class UserSchema(ma.Schema):
     class Meta:
