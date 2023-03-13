@@ -17,12 +17,14 @@ class Workout(db.Model):
     __tablename__ = "workouts"
 
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(), nullable=False)
-    progres = db.Column(db.String())
-    date = db.Column(db.Date())
+    workout_name = db.Column(db.String(), nullable=False, unique=True)
     rest_time = db.Column(db.String())
     rounds = db.Column(db.String())
-    # foreign key
+    muscle_group = db.Column(db.String())
+    level = db.Column(db.String())
+    progres = db.Column(db.String())
+    date = db.Column(db.Date())
+     # foreign key
     user_id = db.Column(
         db.Integer(), db.ForeignKey("users.id"), nullable=False
     )

@@ -39,7 +39,7 @@ def db_seed():
     )
     db.session.add(admin_user)
 
-    user1 = User(
+    arni = User(
         username = 'Arnold Schwarzenegger',
         email = "arni@email.com",
         password = bcrypt.generate_password_hash("p@ssword123").decode("utf-8"),
@@ -47,9 +47,9 @@ def db_seed():
         # password = "password123",
         mobile_number = "2345235"
     )
-    db.session.add(user1)
+    db.session.add(arni)
 
-    user2 = User(
+    wolf = User(
         username = 'Wolf Blitzer',
         email = "wolf@email.com",
         password = bcrypt.generate_password_hash("pword123").decode("utf-8"),
@@ -57,39 +57,45 @@ def db_seed():
         # password = "password123",
         mobile_number = "0404 456 464"
     )
-    db.session.add(user2)
+    db.session.add(wolf)
     db.session.commit()
 
     first_workout = Workout(
-        name = "upper body",
-        progres = '25 min',
-        date = date.today(),
+        workout_name = "Upper B",
         rest_time = "1 min",
         rounds = "5",
-               
-        user_id = user1.id
+        body_region = "upper body",
+        level = "easy",
+        progres = '25 min',
+        date = date.today(),
+                 
+        user_id = arni.id
     )
     db.session.add(first_workout)
 
     core_workout = Workout(
-        name = "core",
-        progres = '30 min',
+        workout_name = "core 1",
+        rest_time = "1 min",
+        rounds = "max rounds in 5min",
+        body_region = "core",
+        level = "easy",
+        progres = '25 min',
         date = date.today(),
-        rest_time = "2 min",
-        rounds = "8",
         
-        user_id = admin_user.id
+        user_id = wolf.id
     )
     db.session.add(core_workout)
 
     whole_workout = Workout(
-        name = "whole",
-        progres = '30 min',
+        workout_name = "whole 1",
+        rest_time = "1 min",
+        rounds = "max rounds in 5min",
+        body_region = "whole",
+        level = "hard",
+        progres = '25 min',
         date = date.today(),
-        rest_time = "2 min",
-        rounds = "8",
         
-        user_id = admin_user.id
+        user_id = wolf.id
     )
     db.session.add(whole_workout)
 

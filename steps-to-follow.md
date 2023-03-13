@@ -53,7 +53,9 @@ Display all exercise based on a workout Id workout controller, function to pick 
 
 13/03 Mon
 Update workout function: make sure that user can not change the name to an existing name
-Start documentation
+Start documentation, readme
+
+14
 
 
 ## Workout_exercises controller:

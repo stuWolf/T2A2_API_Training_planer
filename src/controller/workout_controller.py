@@ -14,7 +14,7 @@ workout = Blueprint('workouts', __name__, url_prefix="/workouts")
 
 # Ammend and delete workout (only admin or user who created workout)
 
-# print all workouts
+# print all workouts of logged in userR
 @workout.get("/")
 @jwt_required()
 def get_workouts():
@@ -50,11 +50,13 @@ def create_workout():
 
     # load workout fields from json
     workout_fields = workout_schema.load(request.json)
-    name = workout_fields["name"]
-    print(name)
-    workout = Workout.query.filter_by(name=name).first()
+    workout_name = workout_fields["workout_name"]
+    if not workout_name
+         return abort(400, description=f"The workout needs a name")
+    print(workout_name)
+    workout = Workout.query.filter_by(workout_name=workout_name).first()
     if workout:
-        return abort(400, description=f"A workout with the name {name} already exists")
+        return abort(400, description=f"A workout with the name {workout_name} already exists")
     # create ew workout object
     workout = Workout(**workout_fields)
     workout.date = date.today()
@@ -70,9 +72,9 @@ def create_workout():
 
 # Delete workout (only admin or user who created it can delete )
 
-@workout.delete("/<int:id>")
+@workout.delete("/<string:workout_name>")
 @jwt_required()
-def delete_workout(id):
+def delete_workout(workout_name):
     #get the operator id invoking get_jwt_identity and find it in the DB
     user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
@@ -82,14 +84,11 @@ def delete_workout(id):
     if not workout:
         return abort(401, description="you have no workouts created yet")
     #Test if workouts with this id exist
-
-    workout = Workout.query.get(id)
+# get the workout
+    workout = Workout.query.filter_by(workout_name=workout_name).first()
     if not workout:
-        return abort(401, description=f"a workout with the id {id} does not exist")
-
+        return abort(401, description=f"a workout with the id {workout_name} does not exist")
     
-    # get the workout
-    workout = Workout.query.filter_by(id=id).first()
     # Stop the request if the user is not an admin or tries to edit someone elses card
     if not (user.admin or  (user_id == workout.user_id)):
         return abort(401, description="You can only edit your own workouts or need to be an admin")
@@ -103,7 +102,7 @@ def delete_workout(id):
     db.session.delete(workout)
     db.session.commit()
     #return the workout in the response
-    return jsonify({"workout_user":workout.user_id, "logedin_user": user_id, "workout_id": workout.id, '_comment': "deleted:"})
+    return jsonify({"workout_user":workout.user_id, "workout_name": workout.workout_name, '_comment': "deleted:"})
 
 # Amend workout (only user who created it)
 
@@ -132,16 +131,16 @@ def update_workout(id):
 
     # load workout fields from json
     workout_fields = workout_schema.load(request.json)
-    new_name = workout_fields["name"]
+    new_name = workout_fields["workout_name"]
 
-    # check if any workout except the current one has that name
-    workout = Workout.query.filter_by(name=new_name).first()
+    # check if any workout except the current one has that workout_name
+    workout = Workout.query.filter_by(workout_name=new_name).first()
     if workout:
-        return abort(400, description=f"A workout with the name {name} already exists")
+        return abort(400, description=f"A workout with the name {new_name} already exists")
     # workout = Workout.query.filter_by(name=name).first()
     # if workout:
         
-    #     return abort(400, description=f"A workout with the name {name} already exists")
+    #     return abort(400, description=f"A workout with the workout_name {workout_name} already exists")
     # name=workout_fields["name"]
      
 
@@ -157,7 +156,7 @@ def update_workout(id):
     # workout.user_id = user_id
     # finally update workout
     workout.date = date.today()
-    workout.name = name
+    workout.workout_name = new_name
     workout.progres = workout_fields["progres"]
     workout.rest_time = workout_fields["rest_time"]
     workout.rounds = workout_fields["rounds"]
