@@ -20,7 +20,7 @@ workout = Blueprint('workouts', __name__, url_prefix="/workouts")
 def get_workouts():
     user_id = get_jwt_identity()
     workouts = Workout.query.filter_by(user_id=user_id).all()
-    # workouts = Workout.query.all()
+    
 
 
     
