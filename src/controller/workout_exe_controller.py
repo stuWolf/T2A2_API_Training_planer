@@ -19,7 +19,7 @@ workout_exercise = Blueprint('workout_exercises', __name__, url_prefix="/workout
 # def get_workout_exercises():
 #     workout_exercises = Workout_Exercise.query.all()
 #     return workout_exercises_schema.dump(workout_exercises)
-
+# Display all exercise based on workout ID
 @workout_exercise.get("/<int:workout_id>")
 def get_exercises(workout_id):
     # exercises = Exercise.query.all()

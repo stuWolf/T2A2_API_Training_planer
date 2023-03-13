@@ -16,8 +16,14 @@ workout = Blueprint('workouts', __name__, url_prefix="/workouts")
 
 # print all workouts
 @workout.get("/")
+@jwt_required()
 def get_workouts():
-    workouts = Workout.query.all()
+    user_id = get_jwt_identity()
+    workouts = Workout.query.filter_by(user_id=user_id).all()
+    # workouts = Workout.query.all()
+
+
+    
     return workouts_schema.dump(workouts)
 
 
@@ -126,7 +132,12 @@ def update_workout(id):
 
     # load workout fields from json
     workout_fields = workout_schema.load(request.json)
-    name = workout_fields["name"]
+    new_name = workout_fields["name"]
+
+    # check if any workout except the current one has that name
+    workout = Workout.query.filter_by(name=new_name).first()
+    if workout:
+        return abort(400, description=f"A workout with the name {name} already exists")
     # workout = Workout.query.filter_by(name=name).first()
     # if workout:
         

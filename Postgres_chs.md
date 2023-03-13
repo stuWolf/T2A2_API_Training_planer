@@ -93,16 +93,19 @@ Thanks 🙂
 ## Postgres commands
 
 # start postgres
-
-sudo -u postgres psql
+service postgresql status
+sudo service postgresql start (if down)
+\conninfo # returns port
+sudo -u postgres psql   # start dB
 
 # create DB
 
-CREATE DATABASE trello_clone_db;
+CREATE DATABASE trello_clone_db; fitt_api_db
 
 # Connect to the database:
 
 \c trello_clone_db;
+\c fitt_api_db;
 
 # Create a user to manage this database:
 
@@ -110,10 +113,60 @@ CREATE USER db_dev WITH PASSWORD '123456';
 
 GRANT ALL PRIVILEGES ON DATABASE trello_clone_db TO db_dev;
 
+CREATE DATABASE trello_clone_db;
+DROP DATABASE 
+
+
+
+
 # commands
 
 \l  list DB
 \dt  list all tables
-\d display table location
+\d location display table location
 \q quit
-select * from "cards";    show contents of table cards
+select * from cards;    show contents of table cards
+
+Insert: 
+INSERT INTO EMPLOYEES VALUES (1, 'Susan', 'McDonald', '12/03/1995', 12, 'Project manager');
+Select:
+SELECT first_name, last_name, position FROM EMPLOYEES;
+SELECT DISTINCT proj_location FROM PROJECTS;  ommits dublicates
+
+SELECT * FROM PROJECTS WHERE proj_location = 'Melbourne';
+SELECT first_name, last_name, position, dob
+FROM EMPLOYEES 
+WHERE dob > '01/01/1995';
+
+SELECT first_name, last_name, position, dob 
+FROM EMPLOYEES 
+WHERE dob > '01/01/1995' AND dob < '12/31/1995';
+
+SELECT proj_name, proj_location FROM PROJECTS WHERE proj_location = 'Melbourne' ORDER BY proj_name ; ASC DSC
+
+## LIKE keyword and Pattern Match Search Condition
+dept_name LIKE ‘I%’ -> Must start with an I, but can then be anything.
+
+dept_name LIKE ‘S_____’ -> Must be 5 characters starting with an S.
+
+dept_name LIKE ‘%s’ -> Any sequence of characters ending with an s.
+
+dept_name NOT LIKE ‘A%’ -> This means the 1st character cannot be an A.
+
+SELECT * FROM DEPARTMENTS WHERE dept_name LIKE '%s';
+
+## Delete
+DELETE FROM DEPARTMENTS WHERE dept_name = 'Operations';
+DELETE FROM DEPARTMENTS; deletes all rows
+
+## update
+UPDATE EMPLOYEES SET department_id = 12; updates all employees to dtpartment 12
+UPDATE EMPLOYEES SET department_id = 11 WHERE emp_id = 5;
+  sets employee id 5 to ddepartment 11
+
+## join tables
+
+SELECT * FROM EMPLOYEES, DEPARTMENTS;  not good, gives cartesian product
+Better:
+SELECT first_name, last_name, position, dept_name FROM EMPLOYEES, DEPARTMENTS 
+WHERE department_id = dept_id;

@@ -26,3 +26,11 @@ pip install flask-sqlalchemy
 
 pw_hash = bcrypt.generate_password_hash('hunter2')
 bcrypt.check_password_hash(pw_hash, 'hunter2') # returns True
+
+```json
+ {   
+    "email": "wolf@gmail.com",
+        "password": "dudrst"
+
+}
+```

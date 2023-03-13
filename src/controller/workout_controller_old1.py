@@ -13,9 +13,11 @@ workout = Blueprint('workouts', __name__, url_prefix="/workouts")
 
 # Ammend and delete workout (only admin or user who created workout)
 
-# print all workouts
+# print all workouts for the logged in user
 @workout.get("/")
+
 def get_workouts():
+    
     workouts = Workout.query.all()
     return workouts_schema.dump(workouts)
 
