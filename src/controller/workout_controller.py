@@ -114,11 +114,7 @@ def update_workout(workout_name):
     user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
     # find the workout, test if it exists
-     # get the workout
-    workout_old = Workout.query.filter_by(workout_name=workout_name).first()
-    if not workout_old:
-        return abort(401, description=f"a workout with the name {workout_name} does not exist")
-
+   
     workout = Workout.query.get(user_id)
     #Test if workouts under the name of operator exist
     if not workout:
@@ -129,32 +125,20 @@ def update_workout(workout_name):
         return abort(401, description="You can only edit your own workouts or need to be an admin")
 
      # get the workout
+   
     workout_old = Workout.query.filter_by(workout_name=workout_name).first()
+    if not workout_old:
+        return abort(401, description=f"a workout with the name {workout_name} does not exist")
     # load workout fields from json
     workout_fields = workout_schema.load(request.json)
     new_name = workout_fields["workout_name"]
-
+# if a workout with the new name exists and the current workout has not 
     # check if any workout except the current one has that workout_name
     workout = Workout.query.filter_by(workout_name=new_name).first()
-    if workout and not workout_old.name == workout_name:
-        return abort(400, description=f"you nan't use  {new_name} it already exists")
-    # workout = Workout.query.filter_by(name=name).first()
-    # if workout:
-        
-    #     return abort(400, description=f"A workout with the workout_name {workout_name} already exists")
-    # name=workout_fields["name"]
-     
-
-    # exercise = Exercise.query.get(name) # argument needs to be int, so id only
-    # if not workout:
-    #     # return an abort message to inform the exercise. That will end the request
-    #     return abort(400, description=f"An workout with the name {name} does not exist")
-    # old_id = workout.id
-    # user_id = workout.user_id
-    # create new object with updated exercise filds
-    # workout = Workout(**workout_fields)
-    # workout.id = old_id # keep old exercise id
-    # workout.user_id = user_id
+    if workout and not (workout_old.workout_name == new_name):
+    # if  not workout_old.name == workout_name:
+        return abort(400, description=f"you nan not use the name {new_name} ,it already exists")
+    
     # finally update workout
     workout = Workout.query.filter_by(workout_name=workout_name).first()
     workout.workout_name = new_name
