@@ -1,9 +1,10 @@
 from main import db
 from flask import Blueprint, request, abort, jsonify
-from model.models import  Exercise, User
-from schema.schemas import  exercise_schema, exercises_schema
+from model.models import  Exercise, Exercise_filter, User
+from schema.schemas import  exercise_schema, exercises_schema, exercise_filter_schema,exercises_filter_schema
 from flask_jwt_extended import  jwt_required, get_jwt_identity
-
+from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 
 exercise = Blueprint('exercises', __name__, url_prefix="/exercises")
@@ -20,7 +21,10 @@ def get_exercises():
 
 @exercise.get("/<string:body_region>")
 def get_nr_exercises(body_region):
-
+    # exercises_filter = Exercise_filter
+    # exercises_filter.drop(engine)
+    # db.([exercises_filter])
+    
     # Filter the table to get the rows with matching attribute_name
     # filtered_rows = Exercise.query.filter(Exercise.body_region==body_region).all()
 
@@ -28,15 +32,16 @@ def get_nr_exercises(body_region):
     # random_element = Exercise.query.filter(Exercise.body_region==body_region).order_by(func.random()).limit(1).one()
     exercises = Exercise.query.filter_by(body_region=body_region)
 
-    # exercise = Exercise.query.order_by(func.random()).limit(1).one()
+    
     if not exercises:
         
         return abort(400, description=f"Exercises for {body_region} have not been created")
-
-    # filter_exercises = Exercise_filter()
-    # stmt = insert(filter_exercises).values(id= exercises.id, name = exercises.name,
-    #                                                    description = exercises.description, interval_time = exercises.interval_time, repetitions = exercises.repetitions, body_region = exercises.body_region, level = exercises.level, weight = exercises.weight)
-
+    # Session.bulk_insert_mappings(Exercise_filter, exercises)
+    # # filter_exercises = Exercise_filter()
+    # # stmt = insert(filter_exercises).values(id= exercises.id, name = exercises.name,
+    # #                                                    description = exercises.description, interval_time = exercises.interval_time, repetitions = exercises.repetitions, body_region = exercises.body_region, level = exercises.level, weight = exercises.weight)
+    # filter_exercises = Exercise_filter.query.all()
+    # exercise_filter = Exercise_filter.query.order_by(func.random()).limit(4)
 
     # random_element = exercises.query.order_by(func.random()).limit(1).one()
     # exercises = Exercise.query.limit(nr)

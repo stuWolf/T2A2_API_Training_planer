@@ -117,7 +117,7 @@ def pick_exercises(workout_id, body_region, level):
                 exercise = Exercise.query.order_by(func.random()).limit(1).one()
                 if exercise.level == level and exercise.body_region == body_region :
                     i +=1
-                    # write exercise in workout exercise table
+                    # store exercise in workout exercise table
                     add_workout_exercise_row(workout_id,exercise.id)
                 else:
                     pass

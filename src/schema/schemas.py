@@ -6,17 +6,9 @@ class ExerciseSchema(ma.Schema):
     class Meta:
         ordered = True
         fields = ("id", "name", "description", "interval_time", "repetitions", "body_region", "level", "weight")
-        
+        load_only = ["id"]
 exercise_schema = ExerciseSchema()
 exercises_schema = ExerciseSchema(many=True)
-
-class Exercise_filterSchema(ma.Schema):
-    class Meta:
-        ordered = True
-        fields = ("id", "name", "description", "interval_time", "repetitions", "body_region", "level", "weight")
-        
-exercise_filter_schema = ExerciseSchema()
-exercises_filter_schema = ExerciseSchema(many=True)
 
 class UserSchema(ma.Schema):
     class Meta:

@@ -132,6 +132,15 @@ Display all exercise based on a workout Id workout controller, function to pick 
 13/03 Mon
 Update workout function: make sure that user can not change the name to an existing name
 Start documentation
+14/03 Tue
+Introduced new table Exercise_filter. The Idea was to filter exercises by level and body region and store the result in this table, than choose 4 random exercises for the training out of that selection.
+It looks like it is session.bulk_insert_mappings(MyTable, rows_to_insert) after all. 
+In the end I solved the problem by drawing a random exercise first and than checking if it matches the criteria. if yes, store the result in workout_exercises if not, draw next exercise and check until  found 4 exercises.
+15/03 Wed
+Tried session.bulk_insert_mappings(MyTable, rows_to_insert) , initialise table on its own but no success
+To do
+List down all routes, test plan, explanation
+
 
 
 ## Workout_exercises controller:
