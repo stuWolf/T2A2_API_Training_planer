@@ -1,10 +1,10 @@
 from main import db
 from flask import Blueprint, request, abort, jsonify
 
-from model.models import  Exercise, User, Workout_Exercise
+from model.models import  Exercise, User, Exercise_filter
 from schema.schemas import  exercise_schema, exercises_schema
 from flask_jwt_extended import  jwt_required, get_jwt_identity
-from sqlalchemy import func
+from sqlalchemy import func, insert
 
 
 exercise = Blueprint('exercises', __name__, url_prefix="/exercises")
@@ -28,12 +28,21 @@ def get_nr_exercises(muscle_group):
 # Choose a random row from the filtered rows
     # random_element = Exercise.query.filter(Exercise.muscle_group==muscle_group).order_by(func.random()).limit(1).one()
     exercises = Exercise.query.filter_by(muscle_group=muscle_group).limit(2)
-    
+
+    # exercise = Exercise.query.order_by(func.random()).limit(1).one()
+
+
+    # filter_exercises = Exercise_filter()
+    # stmt = insert(filter_exercises).values(id= exercises.id, name = exercises.name,
+    #                                                    description = exercises.description, interval_time = exercises.interval_time, repetitions = exercises.repetitions, muscle_group = exercises.muscle_group, level = exercises.level, weight = exercises.weight)
+
+    db.session.add(exercises)
+    db.session.commit()
     # random_element = exercises.query.order_by(func.random()).limit(1).one()
     # exercises = Exercise.query.limit(nr)
     # print (random_element.id)
     # return jsonify({"exercises_id": exercises.exercises_id, '_comment': "deleted:"})
-    return exercises_schema.dump(exercises)
+    return exercises_schema.dump(filter_exercises)
     # return jsonify({'_comment': random_element.id})
 
 # print exercise by id

@@ -51,7 +51,7 @@ def create_workout():
     # load workout fields from json
     workout_fields = workout_schema.load(request.json)
     workout_name = workout_fields["workout_name"]
-    if not workout_name
+    if not workout_name:
          return abort(400, description=f"The workout needs a name")
     print(workout_name)
     workout = Workout.query.filter_by(workout_name=workout_name).first()
@@ -66,7 +66,7 @@ def create_workout():
     db.session.commit()
     #pick 4 exercises based on creterias muscle group and level and store them in workout_exercise table
     result = pick_exercises(workout.id, workout.muscle_group, workout.level)
-    print(f"workout created with {workout.muscle_group, workout.level} and {result}")
+    print(result)
     return workout_schema.dump(workout)
 
 
@@ -106,37 +106,38 @@ def delete_workout(workout_name):
 
 # Amend workout (only user who created it)
 
-@workout.put("/update/<int:id>")
+@workout.put("/update/<string:workout_name>")
 @jwt_required()
-def update_workout(id):
+def update_workout(workout_name):
    
    #get the operator id invoking get_jwt_identity and find it in the DB
     user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
     # find the workout, test if it exists
-    workout = Workout.query.get(id)
-    if not workout:
-        return abort(401, description=f"a workout with the id {id} does not exist")
+     # get the workout
+    workout_old = Workout.query.filter_by(workout_name=workout_name).first()
+    if not workout_old:
+        return abort(401, description=f"a workout with the name {workout_name} does not exist")
 
     workout = Workout.query.get(user_id)
     #Test if workouts under the name of operator exist
     if not workout:
         return abort(401, description="you have no workouts created yet")
-    # get the workout
-    workout = Workout.query.filter_by(id=id).first()
+   
     # Stop the request if the user is not an admin or tries to edit someone elses card
     if not (user.admin or  (user_id == workout.user_id)):
         return abort(401, description="You can only edit your own workouts or need to be an admin")
 
-
+     # get the workout
+    workout_old = Workout.query.filter_by(workout_name=workout_name).first()
     # load workout fields from json
     workout_fields = workout_schema.load(request.json)
     new_name = workout_fields["workout_name"]
 
     # check if any workout except the current one has that workout_name
     workout = Workout.query.filter_by(workout_name=new_name).first()
-    if workout:
-        return abort(400, description=f"A workout with the name {new_name} already exists")
+    if workout and not workout_old.name == workout_name:
+        return abort(400, description=f"you nan't use  {new_name} it already exists")
     # workout = Workout.query.filter_by(name=name).first()
     # if workout:
         
@@ -155,12 +156,15 @@ def update_workout(id):
     # workout.id = old_id # keep old exercise id
     # workout.user_id = user_id
     # finally update workout
-    workout.date = date.today()
+    workout = Workout.query.filter_by(workout_name=workout_name).first()
     workout.workout_name = new_name
-    workout.progres = workout_fields["progres"]
     workout.rest_time = workout_fields["rest_time"]
     workout.rounds = workout_fields["rounds"]
+    workout.muscle_group = workout_fields["muscle_group"]
+    workout.level = workout_fields["level"]
+    workout.progres = workout_fields["progres"]
     
+    workout.date = date.today()
 
     # db.session.add(workout)
     db.session.commit()

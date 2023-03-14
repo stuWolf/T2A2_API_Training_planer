@@ -45,32 +45,86 @@ def pick_exercises(workout_id, muscle_group, level):
 # if muscle_group or level are not null, the exercises need to be filtered and stored in 
 # an own table first. Than the program can pick random exercises from the filtered table
 # the output of query itself is not colatable
+
+    # no muscle_group or level,  
     if not (muscle_group or level):
         for i in range (4):
         #pick 4 exercises and store them in workout_exercise table
             exercise = Exercise.query.order_by(func.random()).limit(1).one()
-        # exercise_id = exercise.id
+        # write a new row into workout_exercises after each iteration
             add_workout_exercise_row(workout_id,exercise.id)
            
         return ("muscle group and level are mixed")
 
     if muscle_group and not level:
-        filter_exercises = Exercise_filter()
+        i = 0
+   
         # get all exercises of muscle group
-        filter_exercises = Exercise.query.filter_by(muscle_group=muscle_group)
-        # store exercises in Exercise filter table
-        db.session.add(filter_exercises)
-        db.session.commit()
-        for i in range (4):
-        #pick 4 exercises from filtered exercises and store them in workout_exercise table
-            exercise = Exercise_filter.query.order_by(func.random()).limit(1).one()
-        # write exercise in workout exercise table
-            add_workout_exercise_row(workout_id,exercise.id)
-        return ("level is mixed")
-    
-    if not muscle_group and level:
+        exercises = Exercise.query.filter_by(muscle_group=muscle_group).first()
 
-        return ("muscle_group is mixed")
+        if exercises:
+            # if exersices of the muscle group exists, select first exercise
+        # store exercises in Exercise filter table
+            
+            while i <= 4:
+            #pick 4 exercises fr<om filtered exercises and store them in workout_exercise table
+                exercise = Exercise.query.order_by(func.random()).limit(1).one()
+                if exercise.muscle_group == muscle_group:
+                    i +=1
+                    # write exercise in workout exercise table
+                    add_workout_exercise_row(workout_id,exercise.id)
+                else:
+                    pass
+            return (f"workout created for the body region {muscle_group}, level is mixed")
+        else:
+            return (f"exercises for the body region {muscle_group} have not been created yet")
+    if not muscle_group and level:
+        i = 0
+   
+        # get all exercises of muscle group
+        exercises = Exercise.query.filter_by(level=level).first()
+
+        if exercises:
+            # if exersices of the muscle group exists, select first exercise
+        # store exercises in Exercise filter table
+            
+            while i <= 4:
+            #pick 4 exercises fr<om filtered exercises and store them in workout_exercise table
+                exercise = Exercise.query.order_by(func.random()).limit(1).one()
+                if exercise.level == level:
+                    i +=1
+                    # write exercise in workout exercise table
+                    add_workout_exercise_row(workout_id,exercise.id)
+                else:
+                    pass
+            return (f" workout created with level {level} muscle_group is mixed")
+        else:
+            return (f"exercises for the level {level} have not been created yet")
+        
+
+    if muscle_group and level:
+        i = 0
+   
+        # get all exercises of muscle group
+        exercises = Exercise.query.filter_by(level=level).filter_by(muscle_group = muscle_group ).first()
+
+        if exercises:
+            # if exersices of the muscle group exists, select first exercise
+        # store exercises in Exercise filter table
+            
+            while i <= 4:
+            #pick 4 exercises fr<om filtered exercises and store them in workout_exercise table
+                exercise = Exercise.query.order_by(func.random()).limit(1).one()
+                if exercise.level == level and exercise.muscle_group == muscle_group :
+                    i +=1
+                    # write exercise in workout exercise table
+                    add_workout_exercise_row(workout_id,exercise.id)
+                else:
+                    pass
+            return (f" workout created with level {level} and muscle group {muscle_group}")
+        else:
+            return (f"exercises with  the combination {muscle_group} and {level} have not been created yet")
+
 
 # write exercise in workout exercise table
 def add_workout_exercise_row(workout_id,exercise_id):

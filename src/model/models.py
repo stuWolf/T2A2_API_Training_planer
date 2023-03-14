@@ -36,10 +36,10 @@ class Workout_Exercise(db.Model):
 
     id = db.Column(db.Integer(), primary_key=True)
     date = db.Column(db.Date())
-    # two foreign keys
+    # thre foreign keys
     workout_id = db.Column(db.Integer(), db.ForeignKey("workouts.id"), nullable=False)
     exercise_id = db.Column(db.Integer(), db.ForeignKey("exercises.id"), nullable=False)
-
+    # exercise_filter_id = db.Column(db.Integer(), db.ForeignKey("exercises_filter.id"))
     
 
 class Exercise(db.Model):
@@ -68,4 +68,4 @@ class Exercise_filter(db.Model):
     muscle_group = db.Column(db.String())
     level = db.Column(db.String())
     weight = db.Column(db.String())
-    workout_exercises = db.relationship('Workout_Exercise', backref='exercise', cascade="all, delete")
+    # workout_exercises = db.relationship('Workout_Exercise', backref='exercise_filter', cascade="all, delete")

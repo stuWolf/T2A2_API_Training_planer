@@ -28,6 +28,7 @@ user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 
 class WorkoutSchema(ma.Schema):
+    
     class Meta:
         ordered = True
         fields = ("id", "workout_name", "rest_time", "rounds","muscle_group", "level", "progres", "date", "user_id", "user")
@@ -43,11 +44,12 @@ workouts_schema = WorkoutSchema(many=True)
 
 class WorkoutExerciseSchema(ma.Schema):
     class Meta:
+        ordered = True
         fields = ("id", "date","workout_id", "exercise_id", "workout", "exercise")
         load_only = ["workout_id", "exercise_id"]
 
     workout = ma.Nested("WorkoutSchema", only=("workout_name", "rest_time", "rounds"))
-    exercise = ma.Nested("ExerciseSchema")
+    exercise = ma.Nested("ExerciseSchema", exclude = ("id",))
 workout_exercise_schema = WorkoutExerciseSchema()
 workout_exercises_schema = WorkoutExerciseSchema(many=True)
 
