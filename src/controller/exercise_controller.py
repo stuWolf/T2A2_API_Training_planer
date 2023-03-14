@@ -1,10 +1,9 @@
 from main import db
 from flask import Blueprint, request, abort, jsonify
-
-from model.models import  Exercise, User, Exercise_filter
+from model.models import  Exercise, User
 from schema.schemas import  exercise_schema, exercises_schema
 from flask_jwt_extended import  jwt_required, get_jwt_identity
-from sqlalchemy import func, insert
+
 
 
 exercise = Blueprint('exercises', __name__, url_prefix="/exercises")
@@ -19,41 +18,32 @@ def get_exercises():
 
 
 
-@exercise.get("/<string:muscle_group>")
-def get_nr_exercises(muscle_group):
+@exercise.get("/<string:body_region>")
+def get_nr_exercises(body_region):
 
     # Filter the table to get the rows with matching attribute_name
-    # filtered_rows = Exercise.query.filter(Exercise.muscle_group==muscle_group).all()
+    # filtered_rows = Exercise.query.filter(Exercise.body_region==body_region).all()
 
 # Choose a random row from the filtered rows
-    # random_element = Exercise.query.filter(Exercise.muscle_group==muscle_group).order_by(func.random()).limit(1).one()
-    exercises = Exercise.query.filter_by(muscle_group=muscle_group).limit(2)
+    # random_element = Exercise.query.filter(Exercise.body_region==body_region).order_by(func.random()).limit(1).one()
+    exercises = Exercise.query.filter_by(body_region=body_region)
 
     # exercise = Exercise.query.order_by(func.random()).limit(1).one()
-
+    if not exercises:
+        
+        return abort(400, description=f"Exercises for {body_region} have not been created")
 
     # filter_exercises = Exercise_filter()
     # stmt = insert(filter_exercises).values(id= exercises.id, name = exercises.name,
-    #                                                    description = exercises.description, interval_time = exercises.interval_time, repetitions = exercises.repetitions, muscle_group = exercises.muscle_group, level = exercises.level, weight = exercises.weight)
+    #                                                    description = exercises.description, interval_time = exercises.interval_time, repetitions = exercises.repetitions, body_region = exercises.body_region, level = exercises.level, weight = exercises.weight)
 
-    db.session.add(exercises)
-    db.session.commit()
+
     # random_element = exercises.query.order_by(func.random()).limit(1).one()
     # exercises = Exercise.query.limit(nr)
     # print (random_element.id)
     # return jsonify({"exercises_id": exercises.exercises_id, '_comment': "deleted:"})
-    return exercises_schema.dump(filter_exercises)
-    # return jsonify({'_comment': random_element.id})
+    return exercises_schema.dump(exercises)
 
-# print exercise by id
-# @exercise.get("/<int:id>")
-# def get_exercise(id):
-#     exercise = Exercise.query.get(id)
-
-#     if not exercise:
-#         return { "message": "An Exercise with that id doesn't exist" }
-
-#     return exercise_schema.dump(exercise)
 
 
 # Register new exercise (admin only)
@@ -136,7 +126,7 @@ def update_exercise():
     exercise.description = exercise_fields["description"]
     exercise.interval_time = exercise_fields["interval_time"]
     exercise.repetitions = exercise_fields["repetitions"]
-    exercise.muscle_group = exercise_fields["muscle_group"]
+    exercise.body_region = exercise_fields["body_region"]
     exercise.level = exercise_fields["level"]
     exercise.weight = exercise_fields["weight"]
     

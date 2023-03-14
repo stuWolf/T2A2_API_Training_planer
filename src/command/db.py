@@ -64,7 +64,7 @@ def db_seed():
         workout_name = "Upper B",
         rest_time = "1 min",
         rounds = "5",
-        muscle_group = "upper body",
+        body_region = "upper body",
         level = "easy",
         progres = '25 min',
         date = date.today(),
@@ -77,7 +77,7 @@ def db_seed():
         workout_name = "core 1",
         rest_time = "1 min",
         rounds = "max rounds in 5min",
-        muscle_group = "core",
+        body_region = "core",
         level = "easy",
         progres = '25 min',
         date = date.today(),
@@ -90,7 +90,7 @@ def db_seed():
         workout_name = "whole 1",
         rest_time = "1 min",
         rounds = "max rounds in 5min",
-        muscle_group = "whole",
+        body_region = "whole",
         level = "hard",
         progres = '25 min',
         date = date.today(),
@@ -107,7 +107,7 @@ def db_seed():
         description = "deploy core",
         interval_time = "na",
         repetitions = "10",
-        muscle_group = "lats, arms",
+        body_region = "lats, arms",
         level = "hard"
 
     )
@@ -118,7 +118,7 @@ def db_seed():
         description = "deploy core",
         interval_time = "na",
         repetitions = "20",
-        muscle_group = "back, shoulder",
+        body_region = "back, shoulder",
         level = "meduim"
 
     )
@@ -129,7 +129,7 @@ def db_seed():
         description = "chest proud",
         interval_time = "na",
         repetitions = "15",
-        muscle_group = "glut",
+        body_region = "glut",
         level = "easy"
     )
     db.session.add(squat_jumps)
@@ -139,7 +139,7 @@ def db_seed():
         description = "n.a.",
         interval_time = "1 min",
         repetitions = "Max reps",
-        muscle_group = "core",
+        body_region = "core",
         level = "easy"
     )
     db.session.add(sit_ups)
@@ -149,7 +149,7 @@ def db_seed():
         description = "elbows on knees",
         interval_time = "1 min",
         repetitions = "Max reps",
-        muscle_group = "core",
+        body_region = "core",
         level = "easy"
     )
     db.session.add(bi_cycle )
@@ -159,7 +159,7 @@ def db_seed():
         description = "hold back streight",
         interval_time = "na",
         repetitions = "20",
-        muscle_group = "chest",
+        body_region = "chest",
         level = "medium"
 
     )
@@ -170,7 +170,7 @@ def db_seed():
         description = "hold back streight",
         interval_time = "na",
         repetitions = "20",
-        muscle_group = "chest",
+        body_region = "chest",
         level = "medium"
 
     )
@@ -181,7 +181,7 @@ def db_seed():
         description = "chest proud",
         interval_time = "3 min",
         repetitions = "Max reps",
-        muscle_group = "chest",
+        body_region = "chest",
         level = "medium",
         weight = "2x 8kg"
 

@@ -65,7 +65,7 @@ def create_workout():
     db.session.add(workout)
     db.session.commit()
     #pick 4 exercises based on creterias muscle group and level and store them in workout_exercise table
-    result = pick_exercises(workout.id, workout.muscle_group, workout.level)
+    result = pick_exercises(workout.id, workout.body_region, workout.level)
     print(result)
     return workout_schema.dump(workout)
 
@@ -98,7 +98,7 @@ def delete_workout(workout_name):
     # if not workout:
     #     return abort(400, description= f"workout {email} does not exist")
     
-    #Delete the card from the database and commit
+    #Delete the workout from the database and commit
     db.session.delete(workout)
     db.session.commit()
     #return the workout in the response
@@ -144,7 +144,7 @@ def update_workout(workout_name):
     workout.workout_name = new_name
     workout.rest_time = workout_fields["rest_time"]
     workout.rounds = workout_fields["rounds"]
-    workout.muscle_group = workout_fields["muscle_group"]
+    workout.body_region = workout_fields["body_region"]
     workout.level = workout_fields["level"]
     workout.progres = workout_fields["progres"]
     
