@@ -115,7 +115,7 @@ def update_exercise():
     
     db.session.commit()
     return jsonify({"user":user.email, "exercise Name": exercise.name, "exercise_id": exercise.id, "level": exercise.level, '_comment': "updated:"})
-    
+    # return exercise_schema.dump(exercise) ?
 
 
 

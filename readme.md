@@ -13,7 +13,7 @@
 
 ## R1: Identify the problem you are trying to solve by building this particular app.
 
-My idea is to create an app that can give the user a randomized sequence of HIT (High intensity training) exercises.
+My idea is to create an app that can give the user a randomized sequence of HIT (High intensity training) exercises in the entity "workouts". 
 
 
 
@@ -37,8 +37,67 @@ GRANT ALL PRIVILEGES ON DATABASE fitt_api_db TO db_dev;
 ## R2: Why is it a problem that needs solving?
 
 ## 3: Why have you chosen this database system. What are the drawbacks compared to others?
+I choose postgreSQL because it is a free and open-source relational database management system (RDBMS) emphasizing extensibility and SQL compliance. It is commonly known as Postgres, and it was developed to provide an open-source alternative to commercial databases like Oracle and Microsoft SQL Server.
+It is widely used and known for its reliability, stability, and security, it is also a popular choice for mission-critical applications. Additionally, PostgreSQL supports several advanced data types, indexing options, and transaction management.
 
+
+PostgreSQL has the following Advantages:
+1. It is open-source software, what makes it a cost-effective solution. 
+2. It has a large and active community of developers, users, and contributors, so there are lots of resources and support available.
+3. It is known for its performance, especially for complex queries and large amounts of data. It also provides a number of features for optimizing performance, such as indexing and caching. (in caching frequently accessed data in cach memory for faster access)
+4. It can handle large amounts of data and can be easily scaled to meet the needs of growing organizations.
+5.	Advanced Data Types: It supports a wide range of data types, including geographic data types, arrays, and hstore (a key-value store).
+
+
+Disadvantages:
+1. Postgres has a steep learning curve for new users, especially those who are not familiar with SQL or relational databases.
+2.	 While PostgreSQL has a strong community of users and contributors, it may not have the same level of commercial support as proprietary databases like Oracle or Microsoft SQL Server.
+3.	Limited Windows Support: While it runs on Windows, it is more commonly used on Unix and Linux platforms, and some features may not be fully supported on Windows.
+4. PostgreSQL does not have native support for mobile platforms, which can limit its use for mobile applications.
+5. Configuring and maintaining PostgreSQL can require a significant amount of effort and technical knowledge, especially for large and complex installations.
+
+
+[1] Cloudflare
 ## R4: Identify and discuss the key functionalities and benefits of an ORM
+
+An ORM (Object-Relational Mapping) is a programming technique that enables developers to work with relational databases using object-oriented programming languages. It provides a set of APIs that abstract away the details of the underlying database and allow developers to interact with data as objects. The key functionalities and benefits of an ORM are:
+
+    Database Abstraction: An ORM provides an abstraction layer between the application and the database. It abstracts away the details of the underlying database, such as SQL queries, data types, and data conversions, and allows developers to interact with the database using objects and methods. This makes it easier to work with databases and reduces the complexity of database interactions.
+
+    Object-Relational Mapping: An ORM maps objects to database tables and vice versa. It provides a way to represent database tables as classes and records as objects. This makes it easier to work with data, as developers can use object-oriented programming concepts, such as inheritance, polymorphism, and encapsulation, to manipulate data.
+
+    CRUD Operations: An ORM provides APIs for creating, reading, updating, and deleting records in the database. This makes it easier to perform CRUD operations, as developers can use object-oriented concepts to manipulate data, rather than writing SQL queries.
+
+    Query Building: An ORM provides APIs for building complex queries, such as joins, filters, and aggregations ("has-a" relationship between objects). This makes it easier to construct complex queries, as developers can use object-oriented concepts to build queries.
+
+    Portability: An ORM allows the same code can be used to interact with different databases (database-agnostic code), without changing the code. This makes it easier to switch between databases, as the ORM handles the differences between databases.
+
+    Maintainability: The code can be easily maintained and updated, without affecting the underlying database schema. This makes it easier to update the application, as the ORM handles the changes to the database schema.
+
+
+
+
+## R5: Document all endpoints for your API
+# Login
+
+
+
+
+
+# create workout
+
+# Ammend and delete workout (only admin or user who created workout)
+
+# create, ammend and delete exercise (admin only)
+
+
+# Create workout exercise ( randomly choose 4 exercises from exercises list)
+
+# print out all exercises of a workout id
+# fetch all exercises of under a workout id number from Workout_exercises 
+# look up exercises for each exercise id and print them out
+
+
 I intend to implement the following functions (routes):
 
     Register user, admins can delete users
@@ -49,7 +108,6 @@ I intend to implement the following functions (routes):
     The user can delete a workout
 
 
-## R5: Document all endpoints for your API
 
 
 ### User controller:
