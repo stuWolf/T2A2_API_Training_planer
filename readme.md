@@ -31,6 +31,7 @@ GRANT ALL PRIVILEGES ON DATABASE fitt_api_db TO db_dev;
 ### 3. connect to DB
 \c fitt_api_db;
 
+### 4. initialise program
 
 
 ## R2: Why is it a problem that needs solving?
@@ -138,6 +139,8 @@ It looks like it is session.bulk_insert_mappings(MyTable, rows_to_insert) after 
 In the end I solved the problem by drawing a random exercise first and than checking if it matches the criteria. if yes, store the result in workout_exercises if not, draw next exercise and check until  found 4 exercises.
 15/03 Wed
 Tried session.bulk_insert_mappings(MyTable, rows_to_insert) , initialise table on its own but no success
+Issues with .first()  exercises = Exercise.query.filter_by(body_region=body_region).first()
+onject not collatable error
 To do
 List down all routes, test plan, explanation
 

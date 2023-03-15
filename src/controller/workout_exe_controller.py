@@ -7,26 +7,28 @@ from sqlalchemy import func
 
 workout_exercise = Blueprint('workout_exercises', __name__, url_prefix="/workout_exercises")
 
-# Create workout exercise ( randomly choose 4 exercises from exercises list)
 
-# print out all exercises of a workout id
-# fetch all exercises of under a workout id number from Workout_exercises 
-# look up exercises for each exercise id and print them out
 
-# print all workout_exercises
-# @workout_exercise.get("/")
-# def get_workout_exercises():
-#     workout_exercises = Workout_Exercise.query.all()
-#     return workout_exercises_schema.dump(workout_exercises)
-
-# Display all exercise based on workout ID
+# Display all exercise based on workout name
 # change to workout name !
 @workout_exercise.get("/<string:workout_name>")
 def get_exercises(workout_name):
-    # exercises = Exercise.query.all()
+    
+        # test if workout name exists
     workout = Workout.query.filter_by(workout_name=workout_name).first()
-    workout_exercises = Workout_Exercise.query.filter_by(workout_id=workout.id)
-    return workout_exercises_schema.dump(workout_exercises)
+    if not workout:
+        return abort(400, description=f"The workout { workout_name} does not exist")
+     # check if workout has exercises
+    work_exercises = Workout_Exercise.query.filter_by(workout_id=workout.id).first()
+    if not work_exercises:
+        print(" not work_exercises")
+        return (f"the workout  { workout_name} has no exercises")
+
+    # list exercises   
+    work_exercises = Workout_Exercise.query.filter_by(workout_id=workout.id)
+    print(" dump_exercises")
+    return workout_exercises_schema.dump(work_exercises)
+    
 
 # print workout_exercise of one id
 @workout_exercise.get("/<int:id>")
@@ -34,19 +36,19 @@ def get_workout_exercise(id):
     workout_exercise = Workout_Exercise.query.get(id)
 
     if not workout_exercise:
-        return {"reckord does not exist" }
+        return ("record does not exist" )
 
     return workout_exercise_schema.dump(workout_exercise)
 
 
 #pick 4 exercises based on creterias muscle group and level and store them in workout_exercise table
-# Create 4 new workout_exercise
+# Create 4 new workout_exercise entries
 def pick_exercises(workout_id, body_region, level):
 # if body_region or level are not null, the exercises need to be filtered and stored in 
 # an own table first. Than the program can pick random exercises from the filtered table
 # the output of query itself is not colatable
 
-    # no body_region or level,  
+    # no body_region or level specified  
     if not (body_region or level):
         for i in range (4):
         #pick 4 exercises and store them in workout_exercise table
@@ -55,7 +57,7 @@ def pick_exercises(workout_id, body_region, level):
             add_workout_exercise_row(workout_id,exercise.id)
            
         return ("muscle group and level are mixed")
-
+    # body region specified but not level
     if body_region and not level:
         i = 0
    
@@ -64,9 +66,9 @@ def pick_exercises(workout_id, body_region, level):
 
         if exercises:
             # if exersices of the muscle group exists, select first exercise
-        # store exercises in Exercise filter table
+
             
-            while i <= 3:
+            while i < 4:
             #pick 4 exercises fr<om filtered exercises and store them in workout_exercise table
                 exercise = Exercise.query.order_by(func.random()).limit(1).one()
                 if exercise.body_region == body_region:
@@ -75,9 +77,10 @@ def pick_exercises(workout_id, body_region, level):
                     add_workout_exercise_row(workout_id,exercise.id)
                 else:
                     pass
-            return (f"workout created for the body region {body_region}, level is mixed")
+            return (f"workout created for the body region { body_region}, level is mixed")
         else:
-            return (f"exercises for the body region {body_region} have not been created yet")
+            return (f"exercises for the body region { body_region} have not been created yet")
+        # level specified but nit body region
     if not body_region and level:
         i = 0
    
@@ -88,7 +91,7 @@ def pick_exercises(workout_id, body_region, level):
             # if exersices of the muscle group exists, select first exercise
         # store exercises in Exercise filter table
             
-            while i <= 3:
+            while i < 4:
             #pick 4 exercises fr<om filtered exercises and store them in workout_exercise table
                 exercise = Exercise.query.order_by(func.random()).limit(1).one()
                 if exercise.level == level:
@@ -101,7 +104,7 @@ def pick_exercises(workout_id, body_region, level):
         else:
             return (f"exercises for the level {level} have not been created yet")
         
-
+    # both specified
     if body_region and level:
         i = 0
    
@@ -112,7 +115,7 @@ def pick_exercises(workout_id, body_region, level):
             # if exersices of the muscle group exists, select first exercise
         # store exercises in Exercise filter table
             
-            while i <= 3:
+            while i < 4:
             #pick 4 exercises fr<om filtered exercises and store them in workout_exercise table
                 exercise = Exercise.query.order_by(func.random()).limit(1).one()
                 if exercise.level == level and exercise.body_region == body_region :
@@ -137,7 +140,7 @@ def add_workout_exercise_row(workout_id,exercise_id):
     db.session.commit()
 
 
-# Test Function :Create 4 new workout_exercise 
+# Test Function :Create 4 new workout_exercise entries, exercise random
 @workout_exercise.post("/<int:workout_id>")
 def create_workout_exercise(workout_id):
     # user_id = get_jwt_identity()
@@ -150,7 +153,7 @@ def create_workout_exercise(workout_id):
         
     for i in range (4):
         exercise = Exercise.query.order_by(func.random()).limit(1).one()
-        exercise_id = exercise.id
+        
     # try:
     # workout_exercise_fields = workout_exercise_schema.load(request.json)
          # find the workout_exercise
@@ -159,7 +162,7 @@ def create_workout_exercise(workout_id):
         workout_exercise = Workout_Exercise()
         workout_exercise.date = date.today()
         workout_exercise.workout_id = workout_id
-        workout_exercise.exercise_id = exercise_id
+        workout_exercise.exercise_id = exercise.id
         db.session.add(workout_exercise)
         db.session.commit()
        

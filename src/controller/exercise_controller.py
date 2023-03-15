@@ -1,10 +1,9 @@
 from main import db
 from flask import Blueprint, request, abort, jsonify
-from model.models import  Exercise, Exercise_filter, User
-from schema.schemas import  exercise_schema, exercises_schema, exercise_filter_schema,exercises_filter_schema
+from model.models import  Exercise, User
+from schema.schemas import  exercise_schema, exercises_schema
 from flask_jwt_extended import  jwt_required, get_jwt_identity
-from sqlalchemy import func
-from sqlalchemy.orm import Session
+
 
 
 exercise = Blueprint('exercises', __name__, url_prefix="/exercises")
@@ -18,40 +17,22 @@ def get_exercises():
     return exercises_schema.dump(exercises)
 
 
-
+# print all exercises for a body region
 @exercise.get("/<string:body_region>")
 def get_nr_exercises(body_region):
-    # exercises_filter = Exercise_filter
-    # exercises_filter.drop(engine)
-    # db.([exercises_filter])
-    
-    # Filter the table to get the rows with matching attribute_name
-    # filtered_rows = Exercise.query.filter(Exercise.body_region==body_region).all()
+    # test if any exercises for the input regin exist
+    exercises = Exercise.query.filter_by(body_region=body_region).first()
 
-# Choose a random row from the filtered rows
-    # random_element = Exercise.query.filter(Exercise.body_region==body_region).order_by(func.random()).limit(1).one()
-    exercises = Exercise.query.filter_by(body_region=body_region)
-
-    
     if not exercises:
         
-        return abort(400, description=f"Exercises for {body_region} have not been created")
-    # Session.bulk_insert_mappings(Exercise_filter, exercises)
-    # # filter_exercises = Exercise_filter()
-    # # stmt = insert(filter_exercises).values(id= exercises.id, name = exercises.name,
-    # #                                                    description = exercises.description, interval_time = exercises.interval_time, repetitions = exercises.repetitions, body_region = exercises.body_region, level = exercises.level, weight = exercises.weight)
-    # filter_exercises = Exercise_filter.query.all()
-    # exercise_filter = Exercise_filter.query.order_by(func.random()).limit(4)
-
-    # random_element = exercises.query.order_by(func.random()).limit(1).one()
-    # exercises = Exercise.query.limit(nr)
-    # print (random_element.id)
-    # return jsonify({"exercises_id": exercises.exercises_id, '_comment': "deleted:"})
+        return abort(400, description=f"Exercises for { body_region} have not been created yet.")
+ 
+    exercises = Exercise.query.filter_by(body_region=body_region)
     return exercises_schema.dump(exercises)
 
 
 
-# Register new exercise (admin only)
+# Create new exercise (admin only)
 @exercise.post("/")
 @jwt_required()
 def create_exercise():
@@ -68,7 +49,7 @@ def create_exercise():
     exercise = Exercise.query.filter_by(name=name).first()
     if exercise:
         
-        return abort(400, description=f"An exercise with the name {name} already exists")
+        return abort(400, description=f"An exercise with the name { name} already exists")
     
     exercise = Exercise(**exercise_fields)
 
@@ -95,7 +76,7 @@ def delete_exercise(id):
     exercise = Exercise.query.filter_by(id=id).first()
     #return an error if the card doesn't exist
     if not exercise:
-        return abort(400, description= f"Exercise with id {id} does not exist")
+        return abort(400, description= f"Exercise with id { id} does not exist")
     
     #Delete the card from the database and commit
     db.session.delete(exercise)
@@ -123,10 +104,7 @@ def update_exercise():
     if not exercise:
         # return an abort message to inform the exercise. That will end the request
         return abort(400, description=f"An exercise with the name {name} does not exist")
-    # old_id = exercise.id
-    # create new object with updated exercise filds
-    # exercise = Exercise(**exercise_fields)
-    # exercise.id = old_id # keep old exercise id
+    # update values
     exercise.name = exercise_fields["name"]
     exercise.description = exercise_fields["description"]
     exercise.interval_time = exercise_fields["interval_time"]
@@ -135,8 +113,6 @@ def update_exercise():
     exercise.level = exercise_fields["level"]
     exercise.weight = exercise_fields["weight"]
     
-    
-
     db.session.commit()
     return jsonify({"user":user.email, "exercise Name": exercise.name, "exercise_id": exercise.id, "level": exercise.level, '_comment': "updated:"})
     
