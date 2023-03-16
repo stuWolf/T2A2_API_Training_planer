@@ -230,9 +230,15 @@ Tried session.bulk_insert_mappings(MyTable, rows_to_insert) , initialise table o
 Issues with .first()  exercises = Exercise.query.filter_by(body_region=body_region).first()
 object not collatable error
 Documentation
-16/03
-List down all routes, test plan, explanation
-to do: 
+
+16/03 Thursday
+System overview: List down all routes, test plan, explanation
+Test plan: Endpoint,  test data, expected return, result
+Exception handling: wrong or missing key
+
+17/03 Friday
+to do: Implement exception handling for all functions/Routes
+Test,  continue on questions , R1, 2, R4, document endpoints
 
 
 ## Workout_exercises controller:

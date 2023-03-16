@@ -42,22 +42,23 @@ def create_exercise():
     
     if not user.admin:
         return abort(401, description="You need admin rights for this operation")
-    
-    exercise_fields = exercise_schema.load(request.json)
-    name=exercise_fields["name"]
-     # find the exercise, test if name already exists
-    exercise = Exercise.query.filter_by(name=name).first()
-    if exercise:
-        
-        return abort(400, description=f"An exercise with the name { name} already exists")
-    
-    exercise = Exercise(**exercise_fields)
+    try:
+        exercise_fields = exercise_schema.load(request.json)
+        name=exercise_fields["name"]
+        # find the exercise, test if name already exists
+        exercise = Exercise.query.filter_by(name=name).first()
+        if exercise:
+            
+            return abort(400, description=f"An exercise with the name { name} already exists")
+    except Exception as e:
+        return jsonify(message= f'missing or incorrect key: {e} ')
+    else:
+        exercise = Exercise(**exercise_fields)
 
-    db.session.add(exercise)
-    db.session.commit()
+        db.session.add(exercise)
+        db.session.commit()
         
-    
-    return exercise_schema.dump(exercise)
+        return exercise_schema.dump(exercise)
 
 
 # Delete exercise (only admin )
@@ -95,27 +96,30 @@ def update_exercise():
     # Stop the request if the user is not an admin
     if not user.admin:
         return abort(401, description="You need admin rights for this operation")
-    # load user input
-    exercise_fields = exercise_schema.load(request.json)
-    name=exercise_fields["name"]
-     # find the exercise, test if it exists
-    exercise = Exercise.query.filter_by(name=name).first()
-    # exercise = Exercise.query.get(name) # argument needs to be int, so id only
-    if not exercise:
-        # return an abort message to inform the exercise. That will end the request
-        return abort(400, description=f"An exercise with the name {name} does not exist")
-    # update values
-    exercise.name = exercise_fields["name"]
-    exercise.description = exercise_fields["description"]
-    exercise.interval_time = exercise_fields["interval_time"]
-    exercise.repetitions = exercise_fields["repetitions"]
-    exercise.body_region = exercise_fields["body_region"]
-    exercise.level = exercise_fields["level"]
-    exercise.weight = exercise_fields["weight"]
-    
-    db.session.commit()
-    return jsonify({"user":user.email, "exercise Name": exercise.name, "exercise_id": exercise.id, "level": exercise.level, '_comment': "updated:"})
-    # return exercise_schema.dump(exercise) ?
+    try:
+        # load user input
+        exercise_fields = exercise_schema.load(request.json)
+        name=exercise_fields["name"]
+        # find the exercise, test if it exists
+        exercise = Exercise.query.filter_by(name=name).first()
+        # exercise = Exercise.query.get(name) # argument needs to be int, so id only
+        if not exercise:
+            # return an abort message to inform the exercise. That will end the request
+            return abort(400, description=f"An exercise with the name {name} does not exist")
+        # update values
+        exercise.name = exercise_fields["name"]
+        exercise.description = exercise_fields["description"]
+        exercise.interval_time = exercise_fields["interval_time"]
+        exercise.repetitions = exercise_fields["repetitions"]
+        exercise.body_region = exercise_fields["body_region"]
+        exercise.level = exercise_fields["level"]
+        exercise.weight = exercise_fields["weight"]
+    except Exception as e:
+        return jsonify(message= f'missing or incorrect key: {e} ')
+    else:
+        db.session.commit()
+        return jsonify({"user":user.email, "exercise Name": exercise.name, "exercise_id": exercise.id, "level": exercise.level, '_comment': "updated:"})
+        # return exercise_schema.dump(exercise) ?
 
 
 

@@ -158,6 +158,7 @@ SELECT * FROM DEPARTMENTS WHERE dept_name LIKE '%s';
 ## Delete
 DELETE FROM DEPARTMENTS WHERE dept_name = 'Operations';
 DELETE FROM DEPARTMENTS; deletes all rows
+drop table my_table;   remove my_table
 
 ## update
 UPDATE EMPLOYEES SET department_id = 12; updates all employees to dtpartment 12

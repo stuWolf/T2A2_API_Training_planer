@@ -23,7 +23,7 @@ def get_user(id):
     user = User.query.get(id)
 
     if not user:
-        return abort(400, description=f"A workout with id { id } doesn't exist")
+        return abort(400, description=f"A user with id { id } does not exist")
 
     return user_schema.dump(user)
 
@@ -31,30 +31,30 @@ def get_user(id):
 # Register new User
 @user.post("/")
 def create_user():
-    # try:
-    user_fields = user_schema.load(request.json)
-         # find the user
-    user = User.query.filter_by(email=user_fields["email"]).first()
-
-    if user:
-        # return an abort message to inform the user. That will end the request
-        return abort(400, description="Email already registered")
-
-    user = User(**user_fields)
-    user.password = bcrypt.generate_password_hash(user_fields["password"]).decode("utf-8")
-        #Add it to the database and commit the changes
-    user.admin = False  # false by default, not every user can be admin
-
-    db.session.add(user)
-    db.session.commit()
-        #create a variable that sets an expiry date
-        # expiry = timedelta(days=1)
-        #create the access token
-        # access_token = create_access_token(identity=str(user.id), expires_delta=expiry)
-    # except:
-    #     return { "message": "Your information is incorrect" }
+    try:  # find the user
+        user_fields = user_schema.load(request.json)
     
-    return user_schema.dump(user)
+        user = User.query.filter_by(email=user_fields["email"]).first()
+        if user:
+            # return an abort message to inform the user. That will end the request
+            return abort(400, description="Email already registered")
+        # user = User.query.filter_by(email=user_fields["email"]).first()
+        if User.query.filter_by(username=user_fields["username"]).first():
+            # return an abort message to inform the user. That will end the request
+            return abort(400, description="username already registered")
+        user = User(**user_fields)
+        user.password = bcrypt.generate_password_hash(user_fields["password"]).decode("utf-8")
+            #Add it to the database and commit the changes
+        user.admin = False  # false by default, not every user can be admin
+    except Exception as e:
+        # return abort(400, description=f'Wrong or missing key:{`e} ')
+            return jsonify(message= f'wrong or missing key: {e} '),400
+    else:
+        db.session.add(user)
+        db.session.commit()
+            
+    
+        return user_schema.dump(user)
 
 
 # Delete User (admin or user can delete himself )
@@ -98,38 +98,37 @@ def update_user():
               #find the user
         user = User.query.filter_by(id=user_id).first()
 
-
+    try:
     # load user fields from json
-    user_fields = user_schema.load(request.json)
-    email=user_fields["email"]
-    # tests if email already exists in any user except the une logged in
-    user_any = User.query.filter_by(email=email).first()
-
-    if user_any and not user.email == email:
-        # return an abort message to inform the user. That will end the request
-        return abort(400, description=f"Email {email } already registered")
-      #find the user
-
-
+        user_fields = user_schema.load(request.json)
     
-    if not user.admin == True:
-        user.admin = False  # false by default, not every user can be admin
+        email=user_fields["email"]
+        # tests if email already exists in any user except the une logged in
+        user_any = User.query.filter_by(email=email).first()
 
-    # if user:
-    #     # return an abort message to inform the user. That will end the request
-    #     return abort(400, description="Email already registered")
-# update user record
-    # user = User(**user_fields)
-    user.id = user_id  # keep old user id
-    user.username = user_fields["username"]
-    user.mobile_number = user_fields["mobile_number"]
-    user.email = email
-    user.password = bcrypt.generate_password_hash(user_fields["password"]).decode("utf-8")
-        #Add it to the database and commit the changes
-    
+        if user_any and not user.email == email:
+            # return an abort message to inform the user. That will end the request
+            return abort(400, description=f"Email {email } already registered")
+        #find the user
 
-    db.session.commit()
-    return jsonify({"user":user.email, "usename": user.username, "user_id": user.id, '_comment': "updated:"})
+
+        
+        if not user.admin == True:
+            user.admin = False  # false by default, not every user can be admin
+
+        user.id = user_id  # keep old user id
+        user.username = user_fields["username"]
+        user.mobile_number = user_fields["mobile_number"]
+        user.email = email
+        user.password = bcrypt.generate_password_hash(user_fields["password"]).decode("utf-8")
+            #Add it to the database and commit the changes
+    except Exception as e:
+        # return abort(400, description=f'Wrong or missing key:{`e} ')
+            return jsonify(message= f'wrong or missing key: {e} '),400
+    else:
+
+        db.session.commit()
+        return jsonify({"user":user.email, "usename": user.username, "user_id": user.id, '_comment': "updated:"})
     
 
 
@@ -138,22 +137,23 @@ def update_user():
 
 @user.post("/login")
 def auth_login():
-    #get the user data from the request
-    user_fields = user_schema.load(request.json)
-    #find the user in the database by email
-    user = User.query.filter_by(email=user_fields["email"]).first()
-    # there is not a user with that email or if the password is no correct send an error
-    if not user or not bcrypt.check_password_hash(user.password, user_fields["password"]):
-        return abort(401, description="Incorrect email and password")
-    
-    # return jsonify(message='Login suceeded'), 200
-    
-    #create a variable that sets an expiry date
-    expiry = timedelta(days=1)
-    #create the access token
-    access_token = create_access_token(identity=str(user.id), expires_delta=expiry)
-    # return the user email and the access token
-    return jsonify({'_comment': "Login suceeded:","user":user.email, "token": access_token, "admin": user.admin, "user_id": user.id })
+    try:
+        #get the user data from the request
+        user_fields = user_schema.load(request.json)
+        #find the user in the database by email
+        user = User.query.filter_by(email=user_fields["email"]).first()
+        # there is not a user with that email or if the password is no correct send an error
+        if not user or not bcrypt.check_password_hash(user.password, user_fields["password"]):
+            return abort(401, description="Incorrect email and password")
+    except Exception as e:
+        return jsonify(message= f'missing or incorrect key: {e} ')
+    else:
+        #create a variable that sets an expiry date
+        expiry = timedelta(days=1)
+        #create the access token
+        access_token = create_access_token(identity=str(user.id), expires_delta=expiry)
+        # return the user email and the access token
+        return jsonify({'_comment': "Login suceeded:","user":user.email, "token": access_token, "admin": user.admin, "user_id": user.id })
 
 
 
