@@ -10,11 +10,9 @@ from flask_jwt_extended import  jwt_required, get_jwt_identity
 
 workout = Blueprint('workouts', __name__, url_prefix="/workouts")
 
-# create workout
 
-# Ammend and delete workout (only admin or user who created workout)
 
-# print all workouts of logged in userR
+# print all workouts of logged in user
 @workout.get("/")
 @jwt_required()
 def get_workouts():
@@ -35,33 +33,32 @@ def get_workout(id):
     workout = Workout.query.get(id)
 
     if not workout:
-        return{"message": "A workout with that id doesn't exist"  }
+        return{"message": f"A workout with id { id } doesn't exist"  }
 
     return workout_schema.dump(workout)
 
 
-# Create new workout
+# Create new workout with the user id of logged in user
 @workout.post("/")
 @jwt_required()
 def create_workout():
     user_id = get_jwt_identity()
-    # user = User.query.get(user_id)
-
 
     # load workout fields from json
     workout_fields = workout_schema.load(request.json)
+    # test if workout name is provided
     workout_name = workout_fields["workout_name"]
     if not workout_name:
          return abort(400, description=f"The workout needs a name")
-    print(workout_name)
+    # test if workout name is provided
     workout = Workout.query.filter_by(workout_name=workout_name).first()
     if workout:
         return abort(400, description=f"A workout with the name {workout_name} already exists")
-    # create ew workout object
+    # create new workout object
     workout = Workout(**workout_fields)
     workout.date = date.today()
     workout.user_id = user_id
-    # print(name)
+
     db.session.add(workout)
     db.session.commit()
     #pick 4 exercises based on creterias muscle group and level and store them in workout_exercise table
@@ -77,6 +74,7 @@ def create_workout():
 def delete_workout(workout_name):
     #get the operator id invoking get_jwt_identity and find it in the DB
     user_id = int(get_jwt_identity())
+    # get whole user record
     user = User.query.get(user_id)
 
     workout = Workout.query.get(user_id)
@@ -93,10 +91,6 @@ def delete_workout(workout_name):
     if not (user.admin or  (user_id == workout.user_id)):
         return abort(401, description="You can only edit your own workouts or need to be an admin")
    
-    
-    #return an error if the card doesn't exist
-    # if not workout:
-    #     return abort(400, description= f"workout {email} does not exist")
     
     #Delete the workout from the database and commit
     db.session.delete(workout)

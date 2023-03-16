@@ -10,7 +10,7 @@ workout_exercise = Blueprint('workout_exercises', __name__, url_prefix="/workout
 
 
 # Display all exercise based on workout name
-# change to workout name !
+
 @workout_exercise.get("/<string:workout_name>")
 def get_exercises(workout_name):
     
@@ -44,9 +44,6 @@ def get_workout_exercise(id):
 #pick 4 exercises based on creterias muscle group and level and store them in workout_exercise table
 # Create 4 new workout_exercise entries
 def pick_exercises(workout_id, body_region, level):
-# if body_region or level are not null, the exercises need to be filtered and stored in 
-# an own table first. Than the program can pick random exercises from the filtered table
-# the output of query itself is not colatable
 
     # no body_region or level specified  
     if not (body_region or level):
@@ -129,9 +126,9 @@ def pick_exercises(workout_id, body_region, level):
             return (f"exercises with  the combination {body_region} and {level} have not been created yet")
 
 
-# write exercise in workout exercise table
+# write result in workout exercise table
 def add_workout_exercise_row(workout_id,exercise_id):
-    
+    # createn new object (row)
     workout_exercise = Workout_Exercise()
     workout_exercise.date = date.today()
     workout_exercise.workout_id = workout_id
@@ -140,7 +137,8 @@ def add_workout_exercise_row(workout_id,exercise_id):
     db.session.commit()
 
 
-# Test Function :Create 4 new workout_exercise entries, exercise random
+# Test Function :Create 4 new workout_exercise entries, exercise random, a valid workout id is
+#  required as secondary key
 @workout_exercise.post("/<int:workout_id>")
 def create_workout_exercise(workout_id):
     # user_id = get_jwt_identity()
@@ -154,22 +152,14 @@ def create_workout_exercise(workout_id):
     for i in range (4):
         exercise = Exercise.query.order_by(func.random()).limit(1).one()
         
-    # try:
-    # workout_exercise_fields = workout_exercise_schema.load(request.json)
-         # find the workout_exercise
-    # exercise = Exercise.query.limit(1)
-    # creatennew object
-        workout_exercise = Workout_Exercise()
-        workout_exercise.date = date.today()
-        workout_exercise.workout_id = workout_id
-        workout_exercise.exercise_id = exercise.id
-        db.session.add(workout_exercise)
-        db.session.commit()
+  
+   # write result in workout exercise table
+        add_workout_exercise_row(workout_id,exercise.id)
        
     
     return workout_exercise_schema.dump(workout_exercise)
 
 
-# Delete workout_exercise (only admin or user who created it )
-# not needed as will be deleted automatically with the workout
+# Delete workout_exercise (only admin or user who created it)
+# - not needed as will be deleted automatically with the workout
 

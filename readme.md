@@ -78,6 +78,23 @@ An ORM (Object-Relational Mapping) is a programming technique that enables devel
 
 
 ## R5: Document all endpoints for your API
+## preparatoins to run the program
+## Setup
+### 1. create and connect to db
+sudo -u postgres psql
+CREATE DATABASE fitt_api_db;
+
+
+### 2. Create user for DB, grant all permissions
+CREATE USER db_dev WITH PASSWORD '123456';
+GRANT ALL PRIVILEGES ON DATABASE fitt_api_db TO db_dev;
+
+### 3. connect to DB
+\c fitt_api_db;
+
+### 4. initialise program
+change to T2A2_API_WEB
+flask init
 # Login
 
 
@@ -146,7 +163,7 @@ bcrypt.check_password_hash(pw_hash, 'hunter2') # returns True
 
 ## R8: Describe your projects models in terms of the relationships they have with each other
 
-The database consists of 3 tables: Users, Workouts, exercises and workout_exercises as a mapping table between workouts and exercises.
+The database consists of 4 tables: Users, Workouts, exercises and workout_exercises as a mapping table between workouts and exercises.
 They can have the following relationships:
 -A user can have many workouts; one to many relationship
 -A workout consists of many exercises, an exercise can be in many workouts; many to many relationship and will be resolved in the table workout_exercises.

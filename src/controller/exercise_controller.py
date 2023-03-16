@@ -60,7 +60,7 @@ def create_exercise():
     return exercise_schema.dump(exercise)
 
 
-# Delete exercise (admin or user can delete himself )
+# Delete exercise (only admin )
 
 @exercise.delete("/<int:id>")
 @jwt_required()
@@ -119,21 +119,3 @@ def update_exercise():
 
 
 
-# Login
-
-
-
-
-
-# create workout
-
-# Ammend and delete workout (only admin or user who created workout)
-
-# create, ammend and delete exercise (admin only)
-
-
-# Create workout exercise ( randomly choose 4 exercises from exercises list)
-
-# print out all exercises of a workout id
-# fetch all exercises of under a workout id number from Workout_exercises 
-# look up exercises for each exercise id and print them out
