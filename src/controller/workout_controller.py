@@ -33,7 +33,8 @@ def get_workout(id):
     workout = Workout.query.get(id)
 
     if not workout:
-        return{"message": f"A workout with id { id } doesn't exist"  }
+        return abort(400, description=f"A workout with id { id } doesn't exist")
+
 
     return workout_schema.dump(workout)
 

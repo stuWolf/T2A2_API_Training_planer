@@ -23,7 +23,7 @@ def get_user(id):
     user = User.query.get(id)
 
     if not user:
-        return { "message": "Don't try to hack me" }
+        return abort(400, description=f"A workout with id { id } doesn't exist")
 
     return user_schema.dump(user)
 
@@ -144,7 +144,7 @@ def auth_login():
     user = User.query.filter_by(email=user_fields["email"]).first()
     # there is not a user with that email or if the password is no correct send an error
     if not user or not bcrypt.check_password_hash(user.password, user_fields["password"]):
-        return abort(401, description="Incorrect username and password")
+        return abort(401, description="Incorrect email and password")
     
     # return jsonify(message='Login suceeded'), 200
     

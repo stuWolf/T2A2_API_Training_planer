@@ -148,37 +148,50 @@ Output
 
 ## R7:  Detail any third party services that your app will use
 - The required dependencies can be found in the requirements.txt file, located at ```T2A2_API_WEB/requirements.txt```. 
+I outline the most important packages used:
+# ORM:  
+flask-sqlalchemy , explanation please see R4
 
-# DB adaptor for python
+# flask Marshmallow: 
+To serialize data and convert python objects to JSON or vice versa
 
-pip install psycopg2
-pip install flask-sqlalchemy
-
-# password_hash
+#  Bcrypt()
+password hashing function
+Bcrypt  is a cryptographic algorithm that generates a one-way hash of a password, which makes it difficult for an attacker to obtain the original password, even if they gain access to the stored hash, it is considered to be one of the most secure password-hashing functions available today and is recommended by security experts for use in applications that require strong password protection.
 example:
 ```py
 pw_hash = bcrypt.generate_password_hash('hunter2')
 bcrypt.check_password_hash(pw_hash, 'hunter2') # returns True
 ```
+#  JWTManager()
+
+This library offers the functions to verify the authenticity of JSON Web Tokens (JWTs). we use here create_access_token, jwt_required, get_jwt_identity.
+@jwt_required() only allows a function to be executed after sucessfull verification of user access token. 
+get_jwt_identity returns the user id of the logged in user.
+
 
 ## R8: Describe your projects models in terms of the relationships they have with each other
 
-The database consists of 4 tables: Users, Workouts, exercises and workout_exercises as a mapping table between workouts and exercises.
+The database consists of 4 tables: users in model User, workouts, implemented in model Workout, exercises implemented in model Exercise and workout_exercises  model Workout_Exercise as a mapping table between workouts and exercises.
 They can have the following relationships:
--A user can have many workouts; one to many relationship
--A workout consists of many exercises, an exercise can be in many workouts; many to many relationship and will be resolved in the table workout_exercises.
+-A user can have many workouts; This is a one to many relationship
+-A workout consists of many exercises and an exercise can be in many workouts; This is a  many to many relationship and will be resolved in the table workout_exercises.
 
 ## R9: Discuss the database relations to be implemented in your application
-Difference to R8:
+-A user can have many workouts; This is a one to many relationship. Therefore Workouts will have the foreign key "user_id"
+-A workout consists of many exercises and an exercise can be in many workouts; They are oin a many to many relationship and will be resolved in the table workout_exercises.
+Workout_Exercises will have two foreign keys "workout_id" and "exercise_id"
 
 
 ## R10: Describe the way tasks are allocated and tracked in your project
 
 ![ImplementationPlan](./docs/implementation_plan.png)
 
+## Run journal and todo list:
 08/03 Wednesday
-Spec on discord, create ERD
+put Spec on discord, create ERD
 set up structure and DB
+Planned functions to be implemented:
     Register user, admins can delete users
     Admin can add and delete exercises
     A user can generate a workout consistent of 4 HIT exercises chosen randomly out of the exercise table. The user can add some criteria like level or muscle group.
@@ -215,10 +228,11 @@ In the end I solved the problem by drawing a random exercise first and than chec
 15/03 Wed
 Tried session.bulk_insert_mappings(MyTable, rows_to_insert) , initialise table on its own but no success
 Issues with .first()  exercises = Exercise.query.filter_by(body_region=body_region).first()
-onject not collatable error
-To do
+object not collatable error
+Documentation
+16/03
 List down all routes, test plan, explanation
-
+to do: 
 
 
 ## Workout_exercises controller:
