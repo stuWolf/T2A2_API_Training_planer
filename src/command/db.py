@@ -76,10 +76,10 @@ def db_seed():
     core_workout = Workout(
         workout_name = "core 1",
         rest_time = "1 min",
-        rounds = "max rounds in 5min",
+        rounds = "max rounds in 15min",
         body_region = "core",
         level = "easy",
-        progres = '25 min',
+        progres = '5 rounds',
         date = date.today(),
         
         user_id = wolf.id
@@ -89,7 +89,7 @@ def db_seed():
     whole_workout = Workout(
         workout_name = "whole 1",
         rest_time = "1 min",
-        rounds = "max rounds in 5min",
+        rounds = "5 rounds",
         body_region = "whole",
         level = "hard",
         progres = '25 min',

@@ -54,5 +54,6 @@ class Exercise(db.Model):
     body_region = db.Column(db.String())
     level = db.Column(db.String())
     weight = db.Column(db.String())
+    video = db.Column(db.String())
     workout_exercises = db.relationship('Workout_Exercise', backref='exercise', cascade="all, delete")
 

@@ -12,31 +12,27 @@
 
 
 ## R1: Identify the problem you are trying to solve by building this particular app.
-
-My idea is to create an app that can give the user a randomized sequence of HIT (High intensity training) exercises in the entity "workouts". 
-
-
-
-## Setup
-### 1. create and connect to db
-sudo -u postgres psql
-CREATE DATABASE fitt_api_db;
-DROP DATABASE 
-
-
-### 2. Create user for DB, grant all permissions
-CREATE USER db_dev WITH PASSWORD '123456';
-GRANT ALL PRIVILEGES ON DATABASE fitt_api_db TO db_dev;
-
-### 3. connect to DB
-\c fitt_api_db;
-
-### 4. initialise program
-
+What are the biggest mistakes hampering progress during exercising: 
+- Not tracking progress
+- Not variating your exercises:
+It is important to variate the exercise and sequence to keep the body guessing.
+- not having a workout plan at all
+- poore posture: An exercise done with the wrong posture and body possition can lead to injuries. Having at least a photo as reminder would be helpful.
+Therefore instead of runing around with a sheet of paper it makes sense
+to create an app that shows a sequence of exercises, time interval or reps for every exercise, tips about the exercise (posture), show a picture or video, something like an electronic personal trainer. At the end of the workout the user can update the workout parameters like progres, rest and rounds. THe program could also make suggestions about increasing level of difficulties.
+My idea is to create an app that can give the user a randomized sequence of HIT (High intensity training) exercises, stored in the entity "workouts". it draws 4 randomm exercises from a list of exercises. The program applies a filter based on the criterias "level" and "body region" defined in the workout.
 
 ## R2: Why is it a problem that needs solving?
 
-## 3: Why have you chosen this database system. What are the drawbacks compared to others?
+The potential benefits of having a program that mimics a personal trainer:
+1.	Personalisation: Being able to create personalized fitness plans based on an individual's goals, fitness level, and health history. 
+2.	Accountability: A personal trainer program can help individuals to stay on track with their fitness goals by providing reminders and encouragement to exercise. This can help individuals to stay motivated and committed to their fitness journey.
+3.	Cost-effective: Hiring a personal trainer can be expensive, but a personal trainer program can provide similar guidance and support at a fraction of the cost. 
+4.	Convenience: A personal trainer program can be accessed from anywhere at any time, making it a convenient option for individuals with busy schedules or limited access to fitness facilities.
+5.	progress tracking: A personal trainer program can track progress over time. This can help individuals to make adjustments to their workouts and achieve their goals more effectively.
+
+
+## R3: Why have you chosen this database system. What are the drawbacks compared to others?
 I choose postgreSQL because it is a free and open-source relational database management system (RDBMS) emphasizing extensibility and SQL compliance. It is commonly known as Postgres, and it was developed to provide an open-source alternative to commercial databases like Oracle and Microsoft SQL Server.
 It is widely used and known for its reliability, stability, and security, it is also a popular choice for mission-critical applications. Additionally, PostgreSQL supports several advanced data types, indexing options, and transaction management.
 
@@ -78,6 +74,294 @@ An ORM (Object-Relational Mapping) is a programming technique that enables devel
 
 
 ## R5: Document all endpoints for your API
+
+To keep the readme file at a reasonable sice, I document here the endpoints requiring data input. For the remaining functions please 
+refer to System Overview and Test Plan
+
+## 1. Entity/ module: Users/ user_controller.py
+
+### 1.1. Login: 
+HTTP Request(POST):  http://localhost:5000/users/login
+
+
+```json
+Input:
+ {   
+    "email": "wolf@gmail.com",
+        "password": "dudrst"
+
+}
+
+Output
+{
+    "_comment": "Login suceeded:",
+    "admin": false,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY3OTAxMjIzMywianRpIjoiMDgzMzYwOTctODk1Yi00OTlkLTk1YWUtN2I3NDFmY2NhYjVkIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjMiLCJuYmYiOjE2NzkwMTIyMzMsImV4cCI6MTY3OTA5ODYzM30.LIzpmtw76MoiVkpvke83wfbPs-8BNokA5R5ZStndjis",
+    "user": "wolf@email.com",
+    "user_id": 3
+}
+```
+### 1.2 Register new user
+Authentication: none
+HTTP request (POST): http://localhost:5000/users
+```json
+Input:
+{
+    "admin": false,
+    "email": "wolf@mail.com",
+    "mobile_number": "345345353",
+    "username": "Wolfee Puck",
+    "password": "12345"
+    
+}
+Output:
+{
+    "admin": false,
+    "email": "wolf@mail.com",
+    "id": 4,
+    "mobile_number": "345345353",
+    "password": "$2b$12$jponP3B6qwKMq9unKgeySubRK5/c7N0rXSFGd53kPVShb1q28pwKC",
+    "username": "Wolfee Puck"
+}
+```
+
+### 1.3 Delete User (admin or user can delete himself )
+Authentication: user or admin login
+HTTP request (DELETE): http://localhost:5000/users/wolf@mail.com  (user email)
+
+```json
+Input: email as arg in HTTP request
+Output:
+{
+    "_comment": "deleted:",
+    "user": "wolf@mail.com",
+    "user_id": 4
+}
+```
+
+### 1.4 Amend User (only by the user itself)
+Authentication: user  login
+HTTP request (PUT): http://localhost:5000/users/update
+```json
+input:
+{
+    "admin": false,
+    "email": "wolf@mail.com",
+    "mobile_number": "345345353",
+    "username": "Wolfgang Puck",
+    "password": "12345"
+}
+Output:
+{
+    "_comment": "updated:",
+    "usename": "Wolfgang Puck",
+    "user": "wolf@mail.com",
+    "user_id": 5
+}
+
+```
+
+## 2. Entity/ module: Workouts/ workout_controller.py
+
+### 2.1 Create new workout with logged in user
+Authentication: user  login
+HTTP request (POST): http://localhost:5000/workouts
+
+This is the core function of this API. when the workout gets created the function it calls workout_exe_controller.pick_exercises(workout_id, body_region, level) which selects 4 exercises out of the exercises table based on body_region and level.  the result is stored in workout_exercises and can be displayed in @workout_exercise.get("/<string:workout_name>")
+```json
+Input:
+{
+    "workout_name": "Cardio",
+    "rest_time": "1 min",
+    "rounds": "8 rounds",
+    "body_region": "cardio",
+    "level": "",
+    "progres": "15 min"
+}
+Output:
+{
+    "body_region": "cardio",
+    "date": "2023-03-17",
+    "id": 4,
+    "level": "",
+    "progres": "15 min",
+    "rest_time": "1 min",
+    "rounds": "8 rounds",
+    "user": {
+        "email": "wolf@mail.com"
+    },
+    "workout_name": "Cardio"
+}
+```
+
+### 2.2 Delete workout (only admin or user who created it)
+Authentication: user or admin login
+HTTP request (DELETE): http://localhost:5000/workouts/Cardio
+
+```json
+Output:
+{
+    "_comment": "deleted:",
+    "workout_name": "Cardio",
+    "workout_user": 5
+}
+```
+
+### 2.3 Amend workout (only user who created it)
+
+Authentication: user  login
+HTTP request (PUT): http://localhost:5000/workouts/update/Core2
+
+```json
+Input:
+{
+    "workout_name": "Cardio2",
+    "rest_time": "8 min",
+    "rounds": "max rounds in 15 min",
+    "body_region":"Cardio",
+    "level": "hard",
+    "progres": "5 rounds"
+    
+}
+Output:
+{
+    "body_region": "Cardio",
+    "date": "2023-03-17",
+    "id": 5,
+    "level": "hard",
+    "progres": "5 rounds",
+    "rest_time": "8 min",
+    "rounds": "max rounds in 15 min",
+    "user": {
+        "email": "wolf@mail.com"
+    },
+    "workout_name": "Cardio2"
+}
+```
+
+## 3. Entity/ module: Workout_exercises/ workout_exe_controller.py
+### 3.1 Display all exercises belonging to a workout
+Authentication: none
+HTTP request (PUT): http://localhost:5000/workout_exercises/Upper B
+
+Besides creating a workout, this is the most important function of this API because this should be the interface for the front end to display the exercises of a workout one by one
+with the required extra information loke timer and photo 
+```json
+Input: workout name as http request argument (here Upper B)
+Output:
+[
+    {
+        "date": "2023-03-17",
+        "exercise": {
+            "body_region": "lats, arms",
+            "description": "deploy core",
+            "interval_time": "na",
+            "level": "hard",
+            "name": "Pull Ups",
+            "repetitions": "10",
+            "video": null,
+            "weight": null
+        },
+        "workout": {
+            "rest_time": "1 min",
+            "rounds": "5",
+            "workout_name": "Upper B"
+        }
+    },
+    {
+        "date": "2023-03-17",
+        "exercise": {
+            "body_region": "chest",
+            "description": "hold back streight",
+            "interval_time": "na",
+            "level": "medium",
+            "name": "Push Ups",
+            "repetitions": "20",
+            "video": null,
+            "weight": null
+        },
+        "workout": {
+            "rest_time": "1 min",
+            "rounds": "5",
+            "workout_name": "Upper B"
+        }
+    }
+]
+```
+
+## 4. Entity/ module: Exercises/ exercise_controller.py
+
+### 4.1 Amend exercise (only admin)
+
+Authentication: admin  login
+HTTP request (PUT): http://localhost:5000/exercises/update
+As we use the unique name in the Json request form to identify the record, the name can not be changed.
+```json
+Input:
+{
+    "description": "Back streight",
+    "interval_time": "2 min",
+    "level": "easy",
+    "body_region": "shoulder",
+    "name": "Inverted Row",
+    "repetitions": "Max reps",
+    "weight": "na"
+}
+Output:
+{
+    "_comment": "updated:",
+    "exercise Name": "Inverted Row",
+    "exercise_id": 2,
+    "level": "easy",
+    "user": "admin@email.com"
+}
+```
+### 4.2 Create exercise (only admin)
+
+Authentication: admin  login
+HTTP request (POST): http://localhost:5000/exercises
+
+```json
+Input:
+{
+    "name": "Chest clap push ups",
+    "description": "back sreight",
+    "interval_time": "3 min",
+    "repetitions": "max reps",
+    "body_region": "core",
+    "level": "easy",
+    "weight": "",
+    "video": "a video"
+}
+Output:
+{
+    "body_region": "core",
+    "description": "back sreight",
+    "interval_time": "3 min",
+    "level": "easy",
+    "name": "chest clap push ups",
+    "repetitions": "max reps",
+    "video": "a video",
+    "weight": ""
+}
+```
+
+### 4.2 Delete exercise (only admin)
+
+Authentication: admin  login
+HTTP request (Delete): http://localhost:5000/exercises/4
+
+```json
+Input:
+Exercise Id in HTTP request
+Output:
+{
+    "_comment": "deleted:",
+    "exercise_id": 4,
+    "name": "Sit Ups"
+}
+```
+
 ## preparatoins to run the program
 ## Setup
 ### 1. create and connect to db
@@ -93,56 +377,16 @@ GRANT ALL PRIVILEGES ON DATABASE fitt_api_db TO db_dev;
 \c fitt_api_db;
 
 ### 4. initialise program
-change to T2A2_API_WEB
+change to T2A2_API_WEB/src
 flask init
-# Login
 
 
 
 
 
-# create workout
-
-# Ammend and delete workout (only admin or user who created workout)
-
-# create, ammend and delete exercise (admin only)
-
-
-# Create workout exercise ( randomly choose 4 exercises from exercises list)
-
-# print out all exercises of a workout id
-# fetch all exercises of under a workout id number from Workout_exercises 
-# look up exercises for each exercise id and print them out
-
-
-I intend to implement the following functions (routes):
-
-    Register user, admins can delete users
-    Admin can add and delete exercises
-    A user can generate a workout consistent of 4 HIT exercises chosen randomly out of the exercise table. The user can add some criteria like level or muscle group.
-    The workout will be stored in the workout table.
-    The user can update the time taken to complete a workout
-    The user can delete a workout
 
 
 
-
-### User controller:
-1. Login:
-HTTP Request:
-http://localhost:5000/users/login
-
-Input:
-```json
-http://localhost:5000/users/login
- {   
-    "email": "wolf@gmail.com",
-        "password": "dudrst"
-
-}
-
-Output
-```
 
 ## R6: ERD
 
@@ -182,6 +426,9 @@ They can have the following relationships:
 -A workout consists of many exercises and an exercise can be in many workouts; They are oin a many to many relationship and will be resolved in the table workout_exercises.
 Workout_Exercises will have two foreign keys "workout_id" and "exercise_id"
 
+Future expanshions:
+implement training plan: User has one to many relationship with training plan, training plan has one to many relationship with workout
+Autogenerate training plan based on user information like training goal, fitness level, health history and progress. This could also require to determine the fittness level with a fittness test. Also the progress could be monitored by repeating the fittness test every period of time.
 
 ## R10: Describe the way tasks are allocated and tracked in your project
 

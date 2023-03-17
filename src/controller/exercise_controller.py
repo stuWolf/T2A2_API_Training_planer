@@ -51,7 +51,7 @@ def create_exercise():
             
             return abort(400, description=f"An exercise with the name { name} already exists")
     except Exception as e:
-        return jsonify(message= f'missing or incorrect key: {e} ')
+        return jsonify(message= f'missing or incorrect key: {e} '), 400
     else:
         exercise = Exercise(**exercise_fields)
 
@@ -102,7 +102,7 @@ def update_exercise():
         name=exercise_fields["name"]
         # find the exercise, test if it exists
         exercise = Exercise.query.filter_by(name=name).first()
-        # exercise = Exercise.query.get(name) # argument needs to be int, so id only
+       
         if not exercise:
             # return an abort message to inform the exercise. That will end the request
             return abort(400, description=f"An exercise with the name {name} does not exist")
@@ -115,7 +115,7 @@ def update_exercise():
         exercise.level = exercise_fields["level"]
         exercise.weight = exercise_fields["weight"]
     except Exception as e:
-        return jsonify(message= f'missing or incorrect key: {e} ')
+        return jsonify(message= f'missing or incorrect key: {e} '), 400
     else:
         db.session.commit()
         return jsonify({"user":user.email, "exercise Name": exercise.name, "exercise_id": exercise.id, "level": exercise.level, '_comment': "updated:"})
