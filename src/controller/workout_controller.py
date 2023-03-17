@@ -68,8 +68,9 @@ def create_workout():
         db.session.commit()
         #pick 4 exercises based on creterias muscle group and level and store them in workout_exercise table
         result = pick_exercises(workout.id, workout.body_region, workout.level)
-        print(result)
-        return workout_schema.dump(workout)
+        # print(result)
+        # return workout_schema.dump(workout)
+        return jsonify({'_comment': result,"workout_name":workout.workout_name, "body_region": workout.body_region, "level": workout.level, "progres": workout.progres})
 
 
 # Delete workout (only admin or user who created it can delete )

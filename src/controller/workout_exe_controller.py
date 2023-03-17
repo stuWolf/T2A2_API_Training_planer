@@ -1,9 +1,10 @@
 from main import db
-from flask import Blueprint, abort
-from model.models import Workout_Exercise, Workout, Exercise
+from flask import Blueprint, abort, request, jsonify
+from model.models import Workout_Exercise, Workout, Exercise, User
 from schema.schemas import workout_exercise_schema, workout_exercises_schema
 from datetime import date
 from sqlalchemy import func
+from flask_jwt_extended import  jwt_required, get_jwt_identity
 
 workout_exercise = Blueprint('workout_exercises', __name__, url_prefix="/workout_exercises")
 
@@ -58,11 +59,11 @@ def pick_exercises(workout_id, body_region, level):
     if body_region and not level:
         i = 0
    
-        # get all exercises of muscle group
+       # test if exersices of the muscle group exists, select first exercise
         exercises = Exercise.query.filter_by(body_region=body_region).first()
 
         if exercises:
-            # if exersices of the muscle group exists, select first exercise
+            
 
             
             while i < 4:
@@ -81,13 +82,11 @@ def pick_exercises(workout_id, body_region, level):
     if not body_region and level:
         i = 0
    
-        # get all exercises of muscle group
+         # if exersices of the muscle group exists, select 4 exercise
         exercises = Exercise.query.filter_by(level=level).first()
 
         if exercises:
-            # if exersices of the muscle group exists, select first exercise
-        # store exercises in Exercise filter table
-            
+                       
             while i < 4:
             #pick 4 exercises fr<om filtered exercises and store them in workout_exercise table
                 exercise = Exercise.query.order_by(func.random()).limit(1).one()
@@ -105,15 +104,13 @@ def pick_exercises(workout_id, body_region, level):
     if body_region and level:
         i = 0
    
-        # get all exercises of muscle group
+         # if exersices for specified body_region and muscle group exist, select 4 exercise
         exercises = Exercise.query.filter_by(level=level).filter_by(body_region = body_region ).first()
 
         if exercises:
-            # if exersices of the muscle group exists, select first exercise
-        # store exercises in Exercise filter table
             
             while i < 4:
-            #pick 4 exercises fr<om filtered exercises and store them in workout_exercise table
+            #pick 4 exercises from filtered exercises and store them in workout_exercise table
                 exercise = Exercise.query.order_by(func.random()).limit(1).one()
                 if exercise.level == level and exercise.body_region == body_region :
                     i +=1
@@ -163,3 +160,47 @@ def create_workout_exercise(workout_id):
 # Delete workout_exercise (only admin or user who created it)
 # - not needed as will be deleted automatically with the workout
 
+# Manually add exercise to a workout, workout can only be changed by user who created it
+@workout_exercise.post("/<string:workout_name>")
+@jwt_required()
+def add_workout_exercise(workout_name):
+    user_id = int(get_jwt_identity())
+    user = User.query.get(user_id)
+    
+    workout = Workout.query.get(user_id)
+    #Test if workouts under the name of operator exist
+    if not workout:
+        return abort(401, description="you have no workouts created yet")
+     # test if workout name exists
+    workout = Workout.query.filter_by(workout_name=workout_name).first()
+    if not workout:
+        return abort(400, description=f"The workout { workout_name} does not exist")
+    # Stop the request if the user is not an admin or tries to edit someone elses card
+    
+    if not (user.admin or user_id == workout.user_id):
+        return abort(401, description=f"You can only edit your own workouts or need admin rights")
+   
+    
+    
+    try:
+        workout_exe_fields = workout_exercise_schema.load(request.json)
+        exercise_id= workout_exe_fields["exercise_id"]
+        # find the exercise, test if name already exists
+        exercise = Exercise.query.get(exercise_id)
+        if not exercise:
+            
+            return abort(400, description=f"An exercise with the id { exercise_id} does not exist")
+    except Exception as e:
+        return jsonify(message= f'missing or incorrect key: {e} '), 400
+    else:
+  
+   # write result in workout exercise table
+        add_workout_exercise_row(workout.id, exercise.id)
+       
+    
+    # return workout_exercise_schema.dump(workout_exercise)
+        return jsonify({"added Exercise":exercise.name, "Exercise id": exercise.id, 'to workout': workout.workout_name})
+
+
+# Delete workout_exercise (only admin or user who created it)
+# - not needed as will be deleted automatically with the workout

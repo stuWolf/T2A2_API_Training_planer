@@ -6,7 +6,7 @@ class ExerciseSchema(ma.Schema):
     class Meta:
         ordered = True
         fields = ("id", "name", "description", "interval_time", "repetitions", "body_region", "level", "weight", "video")
-        load_only = ["id"]
+        # load_only = ["id"]
 exercise_schema = ExerciseSchema()
 exercises_schema = ExerciseSchema(many=True)
 
