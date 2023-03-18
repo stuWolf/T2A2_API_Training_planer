@@ -11,6 +11,7 @@ class User(db.Model):
     email = db.Column(db.String(), unique=True)
     password = db.Column(db.String())
     workouts = db.relationship('Workout', backref='user', cascade="all,delete")
+    progresses = db.relationship('Progres', uselist = False, backref='user', cascade="all,delete")
 
 
 class Workout(db.Model):
@@ -30,6 +31,22 @@ class Workout(db.Model):
     )
     workout_exercises = db.relationship('Workout_Exercise', backref='workout', cascade="all, delete")
     
+class Progres(db.Model):
+    __tablename__ = "progresses"
+
+    id = db.Column(db.Integer(), primary_key=True)
+    progres_name = db.Column(db.String())
+    weight = db.Column(db.String())
+    mid_arm = db.Column(db.String())
+    waist = db.Column(db.String())
+    hip = db.Column(db.String())
+    test_score = db.Column(db.String())
+    date = db.Column(db.Date())
+     # foreign key
+    user_id = db.Column(
+        db.Integer(), db.ForeignKey("users.id"),unique = True, nullable=False
+    )
+    progresses = db.relationship('User',  backref='progres')
 
 class Workout_Exercise(db.Model):
     __tablename__ = "workout_exercises"
