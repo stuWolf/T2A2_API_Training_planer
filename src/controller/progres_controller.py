@@ -115,7 +115,7 @@ def update_progres(progres_name):
     user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
     # find the progres, test if it exists
-   
+    print(user_id)
     progres = Progres.query.get(user_id)
     #Test if progress under the name of operator exist
     if not progres:
@@ -143,21 +143,23 @@ def update_progres(progres_name):
             return abort(400, description=f"you can not use the name '{new_name}',it already exists")
         
     #     # finally update progres
-    #     progres = Progres.query.filter_by(progres_name=progres_name).first()
+        progres = Progres.query.filter_by(progres_name=progres_name).first()
         # here first() is OK because progres name is unique
-
-        # progres.progres_name = new_name
-        # progres.rest_time = progres_fields["rest_time"]
-        # progres.rounds = progres_fields["rounds"]
-        # progres.body_region = progres_fields["body_region"]
-        # progres.level = progres_fields["level"]
-        # progres.progres = progres_fields["progres"]
-        progres = Progres(**progres_fields)
+        # progres = Progres(**progres_fields)
+        progres.progres_name = new_name
+        progres.weight = progres_fields["weight"]
+        progres.mid_arm = progres_fields["mid_arm"]
+        progres.waist = progres_fields["waist"]
+        progres.chest = progres_fields["chest"]
+        progres.hip = progres_fields["hip"]
+        progres.test_score = progres_fields["test_score"]
         progres.date = date.today()
     except Exception as e:
         return jsonify(message= f'missing or incorrect key: {e} ')
     else:
     # db.session.add(progres) ??
+
+        # progres.user_id = user_id
         db.session.commit()
         # return jsonify({"user":user.email, "progres_name": progres.name, "progres_id": progres.id, '_comment': "updated:"})
         return progres_schema.dump(progres)

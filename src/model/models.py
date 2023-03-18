@@ -47,7 +47,7 @@ class Progres(db.Model):
     user_id = db.Column(
         db.Integer(), db.ForeignKey("users.id"), nullable=False
     )
-    progresses = db.relationship('User',  backref='progres')
+    # progresses = db.relationship('User',  backref='progres')
 
 class Workout_Exercise(db.Model):
     __tablename__ = "workout_exercises"
