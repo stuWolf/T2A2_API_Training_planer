@@ -521,7 +521,8 @@ Implement Exception handling in all functions: wrong or missing key
 Implement exception handling for all functions/Routes
 Test,  continue on questions , R1, 2, R4, R5, document endpoints
 
-### 18/03 Friday
+### 18/03 Saturday
+Refine questiond  R8, R9, Add entity Progres
 
 
 
