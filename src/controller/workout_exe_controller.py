@@ -172,6 +172,7 @@ def add_workout_exercise(workout_name):
     if not workout:
         return abort(401, description="you have no workouts created yet")
      # test if workout name exists
+    # workout_name= workout_name.strip().replace(" ", "")
     workout = Workout.query.filter_by(workout_name=workout_name).first()
     if not workout:
         return abort(400, description=f"The workout { workout_name} does not exist")

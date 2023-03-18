@@ -45,6 +45,8 @@ def create_exercise():
     try:
         exercise_fields = exercise_schema.load(request.json)
         name=exercise_fields["name"]
+ 
+
         # find the exercise, test if name already exists
         exercise = Exercise.query.filter_by(name=name).first()
         if exercise:

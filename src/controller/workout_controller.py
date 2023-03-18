@@ -53,6 +53,8 @@ def create_workout():
         if not workout_name:
             return abort(400, description=f"The workout needs a name")
         # test if workout name is provided
+        # filter blanks
+        workout_name= workout_name.strip().replace(" ", "")
         workout = Workout.query.filter_by(workout_name=workout_name).first()
         if workout:
             return abort(400, description=f"A workout with the name {workout_name} already exists")
@@ -61,6 +63,7 @@ def create_workout():
     except Exception as e:
         return jsonify(message= f'missing or incorrect key: {e} ')
     else:
+        workout.workout_name = workout_name
         workout.date = date.today()
         workout.user_id = user_id
 
@@ -128,7 +131,8 @@ def update_workout(workout_name):
    
     workout_old = Workout.query.filter_by(workout_name=workout_name).first()
     if not workout_old:
-        return abort(401, description=f"a workout with the name '{workout_name}' does not exist")
+        return jsonify(message= f"a workout with the name '{workout_name}' does not exist"), 400
+
     try:
         # load workout fields from json
         workout_fields = workout_schema.load(request.json)
