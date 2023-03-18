@@ -11,14 +11,17 @@ progres = Blueprint('progresses', __name__, url_prefix="/progresses")
 
 
 
-# get progres of logged in user
+# get progresses of logged in user
 @progres.get("/")
 @jwt_required()
 def get_progresses():
     user_id = get_jwt_identity()
-    progres = Progres.query.filter_by(user_id=user_id)
+    progresses = Progres.query.filter_by(user_id=user_id).all()
 
-    return progres_schema.dump(progres)
+    if not progresses:
+        return abort(401, description="you have no progres record created yet")
+
+    return progresses_schema.dump(progresses)
 
 
 
@@ -50,10 +53,10 @@ def create_progres():
             return abort(400, description=f"The progres needs a name")
         # test if progres name is provided
         # filter blanks
-        # progres_name= progres_name.strip().replace(" ", "")
-        # progres = Progres.query.filter_by(progres_name=progres_name).first()
-        # if progres:
-        #     return abort(400, description=f"A progres with the name {progres_name} already exists")
+        progres_name= progres_name.strip().replace(" ", "")
+        progres = Progres.query.filter_by(progres_name=progres_name).first()
+        if progres:
+             return abort(400, description=f"A progres with the name {progres_name} already exists")
         # # create new progres object
         progres = Progres(**progres_fields)
     except Exception as e:
@@ -62,7 +65,7 @@ def create_progres():
         # progres.progres_name = progres_name
         progres.date = date.today()
         progres.user_id = user_id
-
+        progres.progres_name = progres_name
         db.session.add(progres)
         db.session.commit()
         
@@ -73,27 +76,27 @@ def create_progres():
 
 # Delete progres (of logged in user )
 
-@progres.delete("/")
+@progres.delete("/<string:progres_name>")
 @jwt_required()
-def delete_progres():
+def delete_progres(progres_name):
     #get the operator id invoking get_jwt_identity and find it in the DB
     user_id = int(get_jwt_identity())
     # get whole user record
-    # user = User.query.get(user_id)
+    user = User.query.get(user_id)
 
     progres = Progres.query.get(user_id)
     #Test if progress under the name of operator exist
     if not progres:
         return abort(401, description="you have no progres record created yet")
-    #Test if progress with this id exist
+    #Test if progress with this name exist
 # get the progres
-    # progres = Progres.query.filter_by(progres_name=progres_name).first()
-    # if not progres:
-    #     return abort(401, description=f"a progres with the id { progres_name} does not exist")
+    progres = Progres.query.filter_by(progres_name=progres_name).first()
+    if not progres:
+        return abort(401, description=f"a progres with the id { progres_name} does not exist")
     
-    # # Stop the request if the user is not an admin or tries to edit someone elses card
-    # if not (user.admin or  (user_id == progres.user_id)):
-    #     return abort(401, description="You can only edit your own progress or need to be an admin")
+    # Stop the request if the user is not an admin or tries to edit someone elses card
+    if not (user.admin or  (user_id == progres.user_id)):
+        return abort(401, description="You can only delete your own progress or need to be an admin")
    
     
     #Delete the progres from the database and commit
@@ -104,9 +107,9 @@ def delete_progres():
 
 # Amend progres of logged in user
 
-@progres.put("/")
+@progres.put("/update/<string:progres_name>")
 @jwt_required()
-def update_progres():
+def update_progres(progres_name):
    
    #get the operator id invoking get_jwt_identity and find it in the DB
     user_id = int(get_jwt_identity())
@@ -124,20 +127,20 @@ def update_progres():
 
      # get the progres
    
-    # progres_old = Progres.query.filter_by(progres_name=progres_name).first()
-    # if not progres_old:
-    #     return jsonify(message= f"a progres with the name '{progres_name}' does not exist"), 400
+    progres_old = Progres.query.filter_by(progres_name=progres_name).first()
+    if not progres_old:
+        return jsonify(message= f"a progres with the name '{progres_name}' does not exist"), 400
 
     try:
         # load progres fields from json
         progres_fields = progres_schema.load(request.json)
-    #     new_name = progres_fields["progres_name"]
-    # # if a progres with the new name exists and the current progres has not 
-    #     # check if any progres except the current one has that progres_name
-    #     progres = Progres.query.filter_by(progres_name=new_name).first()
-    #     if progres and not (progres_old.progres_name == new_name):
-    #     # if  not progres_old.name == progres_name:
-    #         return abort(400, description=f"you can not use the name '{new_name}',it already exists")
+        new_name = progres_fields["progres_name"]
+    # if a progres with the new name exists and the current progres has not 
+        # check if any progres except the current one has that progres_name
+        progres = Progres.query.filter_by(progres_name=new_name).first()
+        if progres and not (progres_old.progres_name == new_name):
+        # if  not progres_old.name == progres_name:
+            return abort(400, description=f"you can not use the name '{new_name}',it already exists")
         
     #     # finally update progres
     #     progres = Progres.query.filter_by(progres_name=progres_name).first()

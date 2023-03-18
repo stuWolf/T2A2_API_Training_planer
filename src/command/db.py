@@ -1,7 +1,7 @@
 from main import db, bcrypt
 from flask import Blueprint
 from datetime import date
-from model.models import User, Workout, Workout_Exercise, Exercise
+from model.models import User, Workout, Progres, Workout_Exercise, Exercise
 
 db_cmd = Blueprint("db", __name__)
 
@@ -99,7 +99,19 @@ def db_seed():
     )
     db.session.add(whole_workout)
 
-
+    initial_progres = Progres(
+        progres_name =  "Initial",
+        weight = "85kg",
+        mid_arm = "35cm",
+        waist = "100cm",
+        chest = "108cm",
+        hip = "100cm",
+        test_score ="200 p",
+        date = date.today(),
+        
+        user_id = wolf.id
+    )
+    db.session.add(initial_progres)
    
 
     pull_ups = Exercise(

@@ -27,13 +27,14 @@ class WorkoutSchema(ma.Schema):
         load_only = ["user_id"]
     # user = fields.Nested("UserSchema")
     user = ma.Nested("UserSchema", only=("email",))
-
+workout_schema = WorkoutSchema()
+workouts_schema = WorkoutSchema(many=True)
 
 class ProgresSchema(ma.Schema):
     
     class Meta:
         ordered = True
-        fields = ("id", "progres_name", "weight", "mid_arm","waist", "hip", "test_score", "date", "user_id", "user")
+        fields = ("id", "progres_name", "weight", "mid_arm","waist","chest", "hip", "test_score", "date", "user_id", "user")
         load_only = ["user_id"]
     # user = fields.Nested("UserSchema")
     user = ma.Nested("UserSchema", only=("email",))
