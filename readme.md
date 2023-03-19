@@ -383,6 +383,78 @@ Output:
     "name": "Sit Ups"
 }
 ```
+## 5. Entity:  Progres
+module: progres_controller.py
+
+### 5.1 Create new progres record with the user id of logged in user
+Authentication: user  login
+HTTP request (POST): http://localhost:5000/progresses
+
+```json
+Input:
+{
+    "progres_name": "Advanced4",
+    "weight": "85kg",
+    "mid_arm": "35cm",
+    "waist": "100cm",
+    "chest": " 108cm",
+    "hip": "100cm",
+    "test_score": "200 p"
+}
+Output:
+{
+    "chest": " 108cm",
+    "date": "2023-03-19",
+    "hip": "100cm",
+    "id": 5,
+    "mid_arm": "35cm",
+    "progres_name": "Advanced4",
+    "test_score": "200 p",
+    "user": {
+        "email": "wolf@email.com"
+    },
+    "waist": "100cm",
+    "weight": "85kg"
+}
+```
+### 5.2 print all progres records of logged in user
+Authentication: user  login
+HTTP request (GET): http://localhost:5000/progresses
+Output: all user records
+
+### 5.3 update progress record
+Authentication: user  login
+HTTP request (PUT): http://localhost:5000/progresses/update/Advanced2
+
+```json
+Input:
+{
+    "progres_name": "Advanced2",
+    "weight": "85kg",
+    "mid_arm": "35cm",
+    "waist": "100cm",
+    "chest": " 108cm",
+    "hip": "100cm",
+    "test_score": "200 p"
+}
+Output:
+{
+    "chest": " 108cm",
+    "date": "2023-03-19",
+    "hip": "100cm",
+    "id": 1,
+    "mid_arm": "35cm",
+    "progres_name": "Initi",
+    "test_score": "200 p",
+    "user": {
+        "email": "wolf@email.com"
+    },
+    "waist": "100cm",
+    "weight": "85kg"
+}
+```
+
+
 
 ## Preparatoins to run the program
 ## Setup
@@ -439,19 +511,42 @@ get_jwt_identity returns the user id of the logged in user.
 
 ## R8: Describe your projects models in terms of the relationships they have with each other
 
-The database consists of 4 tables: users in model User, workouts, implemented in model Workout, exercises implemented in model Exercise and workout_exercises  model Workout_Exercise as a mapping table between workouts and exercises.
-They can have the following relationships:
+The database of this API nsists of 5 Models which are:
+ - User model
+ - Pregres reccord model
+ - Workout model
+ - Exercise model 
+ - Workout_exercises  model Workout_Exercise
+ The user model will include attributes such as user name, email, password, Administrator and mobile number. 
+ 
+ It will be associated with:
+
+1. Workout Model: It includes the following attributes: Workout name, rest time, Rounds completed, body region, level, progres (time or number of rounds completed). The workout models will belong to the user model.
+
+2. Progress Record Model: It will include the attributes name, weight, body measurements, date created and test score of a reference workout. The progress tracker model will belong to the user model.
+
+Exercise Model: The exercise model will include the attributes such as name, description, Interval time, repetitions, video demonstration (or picture), difficulty level, and body region. The exercise model will be associated with the workout model.
+
+The Workout Exercises model acts as a map to assign exercises to workouts.
+have the following relationships:
 -A user can have many workouts; This is a one to many relationship
 -A workout consists of many exercises and an exercise can be in many workouts; This is a  many to many relationship and will be resolved in the table workout_exercises.
 
 ## R9: Discuss the database relations to be implemented in your application
--A user can have many workouts; This is a one to many relationship. Therefore Workouts will have the foreign key "user_id"
--A workout consists of many exercises and an exercise can be in many workouts; They are oin a many to many relationship and will be resolved in the table workout_exercises.
-Workout_Exercises will have two foreign keys "workout_id" and "exercise_id"
+The API uses the following database relations:
+
+- User and workouts:  
+A user can have many workouts dependent on body region and difficulty level; This is a one to many relationship. Therefore Workouts will have the foreign key "user_id"
+- User and progres records:  
+ This relation will be a one-to-many relation, as each user can have multiple progress records over time, but each progress record will belong to only one user.
+Therefore progres records will have the foreign key "user_id"
+- Workout and exercises:
+A workout consists of many exercises and an exercise can be in many workouts; They are in a many to many relationship and will be resolved in the table workout_exercises.
+Workout_Exercises will therefore have two foreign keys "workout_id" and "exercise_id"
 
 Future expanshions:
 implement training plan: User has one to many relationship with training plan, training plan has one to many relationship with workout
-Autogenerate training plan based on user information like training goal, fitness level, health history and progress. This could also require to determine the fittness level with a fittness test. Also the progress could be monitored by repeating the fittness test every period of time.
+Autogenerate training plan consistant of different workouts, based on user information like training goal, fitness level, health history and progress. This could also require to determine the fittness level with a fittness test. Also the progress could be monitored by repeating the fittness test every period of time.
 
 ## R10: Describe the way tasks are allocated and tracked in your project
 ### [Project Management](https://trello.com/b/2e4HymYf/hit-fit-app)

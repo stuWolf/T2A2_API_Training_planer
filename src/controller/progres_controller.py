@@ -56,7 +56,7 @@ def create_progres():
         progres_name= progres_name.strip().replace(" ", "")
         progres = Progres.query.filter_by(progres_name=progres_name).first()
         if progres:
-             return abort(400, description=f"A progres with the name {progres_name} already exists")
+             return abort(400, description=f"A progres record with the name {progres_name} already exists")
         # # create new progres object
         progres = Progres(**progres_fields)
     except Exception as e:
@@ -89,14 +89,15 @@ def delete_progres(progres_name):
     if not progres:
         return abort(401, description="you have no progres record created yet")
     #Test if progress with this name exist
-# get the progres
+# get the progres record
+
     progres = Progres.query.filter_by(progres_name=progres_name).first()
     if not progres:
-        return abort(401, description=f"a progres with the id { progres_name} does not exist")
+        return abort(401, description=f"a progres record with the name { progres_name} does not exist")
     
     # Stop the request if the user is not an admin or tries to edit someone elses card
     if not (user.admin or  (user_id == progres.user_id)):
-        return abort(401, description="You can only delete your own progress or need to be an admin")
+        return abort(401, description="You can only delete your own progress record or need to be an admin")
    
     
     #Delete the progres from the database and commit
