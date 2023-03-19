@@ -75,6 +75,10 @@ An ORM (Object-Relational Mapping) is a programming technique that enables devel
 To keep the readme file at a reasonable sice, I document here the endpoints requiring data input. For the remaining functions please 
 refer to System Overview and Test Plan
 
+[Test Plan](./docs/Fit_API_Test_Plan.pdf)
+
+[System Overview](./docs/Fit_API_System_overview.pdf)
+
 ## 1. Entity: Users 
 module: user_controller.py
 
@@ -85,8 +89,8 @@ HTTP Request(POST):  http://localhost:5000/users/login
 ```json
 Input:
  {   
-    "email": "wolf@gmail.com",
-        "password": "dudrst"
+    "email": "wolf@email.com",
+        "password": "pword123"
 
 }
 
@@ -482,6 +486,30 @@ change to T2A2_API_WEB/src then flask db init
 
 
 ## R6: ERD
+The API has the following entities:
+- Users:  Manage User data and access
+
+    attributes : id, Email, Password, Admin, username, mobile_number
+
+ - Workouts: Manage Workout data
+
+    attributes: id, workout_name, rest time, rounds, body_region, level, progres, date, , foreign key: user id
+
+- Progres: manage progres records
+
+    attributes: id, progres_name, weight, mid_arm, waist, chest, hip, test_score_date, foreign key: user id
+
+- Workout_exercises: mapping table between workouts and exercises
+
+    attributes: id, date, foreign keys: workout_id, exercise_id
+
+- Exercises: Manage exercise data
+
+    attributes: id, name, description, interval_time, repetitions, body_region, level, weight
+
+[ERD (PDF)](./docs/Fittnes_API_ERD.pdf)
+
+![ERD](./docs/Screenshot_ERD.jpg)
 
 ## R7:  Detail any third party services that your app will use
 - The required dependencies can be found in the requirements.txt file, located at ```T2A2_API_WEB/requirements.txt```. 
@@ -516,7 +544,7 @@ The database of this API nsists of 5 Models which are:
  - Pregres reccord model
  - Workout model
  - Exercise model 
- - Workout_exercises  model Workout_Exercise
+ - Workout_Exercise model
  The user model will include attributes such as user name, email, password, Administrator and mobile number. 
  
  It will be associated with:
@@ -528,9 +556,7 @@ The database of this API nsists of 5 Models which are:
 Exercise Model: The exercise model will include the attributes such as name, description, Interval time, repetitions, video demonstration (or picture), difficulty level, and body region. The exercise model will be associated with the workout model.
 
 The Workout Exercises model acts as a map to assign exercises to workouts.
-have the following relationships:
--A user can have many workouts; This is a one to many relationship
--A workout consists of many exercises and an exercise can be in many workouts; This is a  many to many relationship and will be resolved in the table workout_exercises.
+
 
 ## R9: Discuss the database relations to be implemented in your application
 The API uses the following database relations:
@@ -551,7 +577,7 @@ Autogenerate training plan consistant of different workouts, based on user infor
 ## R10: Describe the way tasks are allocated and tracked in your project
 ### [Project Management](https://trello.com/b/2e4HymYf/hit-fit-app)
 
-![ImplementationPlan](./docs/implementation_plan.png)
+![ImplementationPlan](./docs/Screenshot_trello.jpg)
 
 ## Run journal and todo list:
 
@@ -617,7 +643,9 @@ Implement exception handling for all functions/Routes
 Test,  continue on questions , R1, 2, R4, R5, document endpoints
 
 ### 18/03 Saturday
-Refine questiond  R8, R9, Add entity Progres
+Refine questions  R8, R9, Add entity "Progres"
+### 18/03 Sunday
+Finish documentation, final touches
 
 
 
