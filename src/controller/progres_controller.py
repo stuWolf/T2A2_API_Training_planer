@@ -69,12 +69,11 @@ def create_progres():
         db.session.add(progres)
         db.session.commit()
         
-        # print(result)
+
         return progres_schema.dump(progres)
-        # return jsonify({'_comment': result,"progres_name":progres.progres_name, "body_region": progres.body_region, "level": progres.level, "progres": progres.progres})
+       
 
-
-# Delete progres (of logged in user )
+# Delete progres record (only logged in user )
 
 @progres.delete("/<string:progres_name>")
 @jwt_required()

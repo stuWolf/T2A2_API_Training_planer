@@ -433,7 +433,7 @@ HTTP request (PUT): http://localhost:5000/progresses/update/Advanced2
 ```json
 Input:
 {
-    "progres_name": "Advanced2",
+    "progres_name": "Advanced",
     "weight": "85kg",
     "mid_arm": "35cm",
     "waist": "100cm",
@@ -448,7 +448,7 @@ Output:
     "hip": "100cm",
     "id": 1,
     "mid_arm": "35cm",
-    "progres_name": "Initi",
+    "progres_name": "Advanced",
     "test_score": "200 p",
     "user": {
         "email": "wolf@email.com"
